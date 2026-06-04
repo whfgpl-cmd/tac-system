@@ -6,7 +6,7 @@
 <title>TAC SYSTEM</title>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, getDocs, updateDoc, doc, query, orderBy, where, serverTimestamp }
+  import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, orderBy, where, serverTimestamp }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
   import { getAuth, signInWithEmailAndPassword, signOut }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -22,7 +22,7 @@
   const app = initializeApp(firebaseConfig);
   window.db   = getFirestore(app);
   window.auth = getAuth(app);
-  window.fb   = { collection, addDoc, getDocs, updateDoc, doc, query, orderBy, where, serverTimestamp, signInWithEmailAndPassword, signOut };
+  window.fb   = { collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, orderBy, where, serverTimestamp, signInWithEmailAndPassword, signOut };
   document.dispatchEvent(new Event('ready'));
 </script>
 <!-- SheetJS for Excel export -->
@@ -55,7 +55,11 @@ tr:hover td{background:#f5f5f5;}
 .msg{padding:8px 12px;margin:8px 0;font-size:13px;border:1px solid;}
 .msg.ok{border-color:#000;background:#f0f0f0;}
 .msg.err{border-color:#c00;background:#fff0f0;color:#c00;}
-.opt-label{font-size:11px;color:#888;font-weight:normal;}
+.btn-icon{background:#fff;border:1px solid #ccc;padding:4px 7px;font-size:15px;cursor:pointer;border-radius:3px;line-height:1;}
+.btn-icon:hover{background:#f0f0f0;}
+.btn-icon.del:hover{background:#fff0f0;border-color:#c00;}
+.btn-icon.edt:hover{background:#f0f4ff;border-color:#336;}
+.act-cell{display:flex;gap:4px;align-items:center;}
 
 /* LAYOUT SIDEBAR */
 .layout{display:flex;flex:1;overflow:hidden;}
@@ -209,10 +213,11 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
                 <th>QTY</th>
                 <th>NOTE</th>
                 <th>STATUS ADMIN</th>
+                <th>AKSI</th>
               </tr>
             </thead>
             <tbody id="cm-tbody">
-              <tr><td colspan="10" style="text-align:center;padding:20px;color:#888;">— belum ada data —</td></tr>
+              <tr><td colspan="11" style="text-align:center;padding:20px;color:#888;">— belum ada data —</td></tr>
             </tbody>
           </table>
         </div>
@@ -338,23 +343,80 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
   </div><!-- /layout -->
 </div>
 
-<!-- ══ MODAL UPDATE STATUS ══ -->
-<div id="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:center;justify-content:center;">
-  <div style="background:#fff;border:2px solid #000;padding:24px;width:100%;max-width:360px;margin:16px;">
-    <h2 style="margin-bottom:12px;">UPDATE STATUS</h2>
-    <p id="modal-info" style="font-size:12px;color:#555;margin-bottom:12px;"></p>
-    <div class="fgroup">
-      <label class="flabel">STATUS ADMIN</label>
-      <select id="modal-status">
-        <option value="DRAFT">DRAFT</option>
-        <option value="WAIT">WAIT</option>
-        <option value="POSTED">POSTED</option>
-        <option value="DONE">DONE</option>
-      </select>
+<!-- ══ MODAL EDIT LENGKAP ══ -->
+<div id="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:center;justify-content:center;overflow-y:auto;">
+  <div style="background:#fff;border:2px solid #000;padding:24px;width:100%;max-width:520px;margin:16px;">
+    <h2 style="margin-bottom:14px;">✏️ EDIT DATA TAC</h2>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <div class="fgroup" style="flex:1;min-width:140px;">
+        <label class="flabel">NAMA</label>
+        <input type="text" id="me-nama">
+      </div>
+      <div class="fgroup" style="flex:1;min-width:120px;">
+        <label class="flabel">TANGGAL</label>
+        <input type="date" id="me-tanggal">
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <div class="fgroup" style="flex:1;min-width:120px;">
+        <label class="flabel">FROM SUB IO</label>
+        <input type="text" id="me-from-io">
+      </div>
+      <div class="fgroup" style="flex:1;min-width:120px;">
+        <label class="flabel">TO SUB IO</label>
+        <input type="text" id="me-to-io">
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <div class="fgroup" style="flex:1;min-width:140px;">
+        <label class="flabel">ITEM DESC</label>
+        <input type="text" id="me-item">
+      </div>
+      <div class="fgroup" style="flex:1;min-width:110px;">
+        <label class="flabel">LOT NO</label>
+        <input type="text" id="me-lot">
+      </div>
+      <div class="fgroup" style="flex:1;min-width:80px;">
+        <label class="flabel">QTY</label>
+        <input type="number" id="me-qty" min="0">
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <div class="fgroup" style="flex:1;min-width:130px;">
+        <label class="flabel">NOTE</label>
+        <select id="me-note">
+          <option value="TAC">TAC</option>
+          <option value="MOVE ORDER">MOVE ORDER</option>
+          <option value="PECAH">PECAH</option>
+          <option value="RETUR">RETUR</option>
+        </select>
+      </div>
+      <div class="fgroup" style="flex:1;min-width:130px;" id="me-status-wrap">
+        <label class="flabel">STATUS ADMIN</label>
+        <select id="me-status">
+          <option value="DRAFT">DRAFT</option>
+          <option value="WAIT">WAIT</option>
+          <option value="POSTED">POSTED</option>
+          <option value="DONE">DONE</option>
+        </select>
+      </div>
     </div>
     <div style="display:flex;gap:8px;margin-top:12px;">
-      <button id="btn-modal-save" onclick="saveStatus()" style="flex:1;">SIMPAN</button>
+      <button id="btn-modal-save" onclick="saveEdit()" style="flex:1;">💾 SIMPAN</button>
       <button onclick="closeModal()" class="outline" style="flex:1;">BATAL</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL KONFIRMASI HAPUS ══ -->
+<div id="modal-del" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;">
+  <div style="background:#fff;border:2px solid #c00;padding:24px;width:100%;max-width:340px;margin:16px;text-align:center;">
+    <div style="font-size:28px;margin-bottom:8px;">🗑️</div>
+    <h2 style="margin-bottom:8px;color:#c00;">HAPUS DATA?</h2>
+    <p id="del-info" style="font-size:13px;color:#555;margin-bottom:18px;"></p>
+    <div style="display:flex;gap:8px;">
+      <button id="btn-del-ok" onclick="konfirmasiHapus()" style="flex:1;background:#c00;border-color:#c00;">YA, HAPUS</button>
+      <button onclick="closeDelModal()" class="outline" style="flex:1;">BATAL</button>
     </div>
   </div>
 </div>
@@ -363,7 +425,7 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
 var role = 'cellman';
 var currentUser = null;
 var allData = [];
-var editId = null;
+var cmData = [];
 
 // ── ROLE TOGGLE ──
 function setRole(r) {
@@ -499,25 +561,34 @@ function loadCMData() {
     window.fb.orderBy('createdAt', 'desc')
   );
   window.fb.getDocs(q).then(function(snap) {
-    var html = ''; var i = 1;
-    snap.forEach(function(d) {
-      var r = d.data();
-      html += '<tr>' +
-        '<td>' + i++ + '</td>' +
-        '<td>' + (r.nama||'-') + '</td>' +
-        '<td>' + (r.tanggal||'-') + '</td>' +
-        '<td>' + (r.fromSubIo||'-') + '</td>' +
-        '<td>' + (r.toSubIo||'-') + '</td>' +
-        '<td>' + (r.itemDesc||'-') + '</td>' +
-        '<td>' + (r.lotNo||'-') + '</td>' +
-        '<td>' + (r.qty||'-') + '</td>' +
-        '<td>' + (r.note||'-') + '</td>' +
-        '<td>' + badge(r.status) + '</td>' +
-        '</tr>';
-    });
-    document.getElementById('cm-tbody').innerHTML = html ||
-      '<tr><td colspan="10" style="text-align:center;padding:20px;color:#888;">— belum ada data —</td></tr>';
+    cmData = [];
+    snap.forEach(function(d) { cmData.push(Object.assign({ _id: d.id }, d.data())); });
+    renderCMTable();
   });
+}
+
+function renderCMTable() {
+  var html = ''; var i = 1;
+  cmData.forEach(function(r) {
+    html += '<tr>' +
+      '<td>' + i++ + '</td>' +
+      '<td>' + (r.nama||'-') + '</td>' +
+      '<td>' + (r.tanggal||'-') + '</td>' +
+      '<td>' + (r.fromSubIo||'-') + '</td>' +
+      '<td>' + (r.toSubIo||'-') + '</td>' +
+      '<td>' + (r.itemDesc||'-') + '</td>' +
+      '<td>' + (r.lotNo||'-') + '</td>' +
+      '<td>' + (r.qty||'-') + '</td>' +
+      '<td>' + (r.note||'-') + '</td>' +
+      '<td>' + badge(r.status) + '</td>' +
+      '<td><div class="act-cell">' +
+        '<button class="btn-icon edt" title="Edit" onclick="openEditModal(\'' + r._id + '\',\'cm\')">✏️</button>' +
+        '<button class="btn-icon del" title="Hapus" onclick="hapusData(\'' + r._id + '\',\'cm\')">🗑️</button>' +
+      '</div></td>' +
+      '</tr>';
+  });
+  document.getElementById('cm-tbody').innerHTML = html ||
+    '<tr><td colspan="11" style="text-align:center;padding:20px;color:#888;">— belum ada data —</td></tr>';
 }
 
 // ── ADMIN LOAD ──
@@ -548,7 +619,6 @@ function filterTable() {
   });
   var html = '';
   filtered.forEach(function(r, i) {
-    var itemSafe = (r.itemDesc||'').replace(/'/g, '');
     html += '<tr>' +
       '<td>' + (i+1) + '</td>' +
       '<td>' + (r.nama||'-') + '</td>' +
@@ -560,33 +630,109 @@ function filterTable() {
       '<td>' + (r.qty||'-') + '</td>' +
       '<td>' + (r.note||'-') + '</td>' +
       '<td>' + badge(r.status) + '</td>' +
-      '<td><button onclick="openModal(\'' + r._id + '\',\'' + (r.status||'DRAFT') + '\',\'' + itemSafe + '\')" class="outline" style="font-size:12px;padding:4px 10px;">EDIT</button></td>' +
+      '<td><div class="act-cell">' +
+        '<button class="btn-icon edt" title="Edit" onclick="openEditModal(\'' + r._id + '\',\'adm\')">✏️</button>' +
+        '<button class="btn-icon del" title="Hapus" onclick="hapusData(\'' + r._id + '\',\'adm\')">🗑️</button>' +
+      '</div></td>' +
       '</tr>';
   });
   document.getElementById('adm-tbody').innerHTML = html ||
     '<tr><td colspan="11" style="text-align:center;padding:20px;color:#888;">— tidak ada data —</td></tr>';
 }
 
-// ── MODAL ──
-function openModal(id, status, item) {
+// ── MODAL EDIT ──
+var editId = null;
+var editCaller = 'adm'; // 'adm' or 'cm'
+var delId = null;
+var delCaller = 'adm';
+
+function openEditModal(id, caller) {
+  // find record
+  var rec = caller === 'cm'
+    ? cmData.find(function(r){ return r._id === id; })
+    : allData.find(function(r){ return r._id === id; });
+  if (!rec) return;
+
   editId = id;
-  document.getElementById('modal-info').textContent = 'Item: ' + item;
-  document.getElementById('modal-status').value = status;
+  editCaller = caller;
+
+  document.getElementById('me-nama').value    = rec.nama    || '';
+  document.getElementById('me-tanggal').value = rec.tanggal || '';
+  document.getElementById('me-from-io').value = rec.fromSubIo !== '-' ? (rec.fromSubIo||'') : '';
+  document.getElementById('me-to-io').value   = rec.toSubIo   !== '-' ? (rec.toSubIo||'')   : '';
+  document.getElementById('me-item').value    = rec.itemDesc  || '';
+  document.getElementById('me-lot').value     = rec.lotNo     || '';
+  document.getElementById('me-qty').value     = rec.qty       || '';
+  document.getElementById('me-note').value    = rec.note      || 'TAC';
+  document.getElementById('me-status').value  = rec.status    || 'DRAFT';
+
+  // cellman tidak bisa edit status
+  document.getElementById('me-status-wrap').style.display = caller === 'cm' ? 'none' : '';
+
   document.getElementById('modal').style.display = 'flex';
 }
+
 function closeModal() {
   document.getElementById('modal').style.display = 'none';
   editId = null;
 }
-function saveStatus() {
+
+function saveEdit() {
   if (!editId) return;
-  var status = document.getElementById('modal-status').value;
   var btn = document.getElementById('btn-modal-save');
   btn.disabled = true; btn.textContent = 'MENYIMPAN...';
-  window.fb.updateDoc(window.fb.doc(window.db, 'tac', editId), { status: status })
-    .then(function() { closeModal(); loadADMData(); })
-    .catch(function(e) { alert('Gagal: ' + e.message); })
-    .finally(function() { btn.disabled = false; btn.textContent = 'SIMPAN'; });
+
+  var updates = {
+    nama      : (document.getElementById('me-nama').value.trim()    || '-').toUpperCase(),
+    tanggal   : document.getElementById('me-tanggal').value,
+    fromSubIo : (document.getElementById('me-from-io').value.trim() || '-').toUpperCase(),
+    toSubIo   : (document.getElementById('me-to-io').value.trim()   || '-').toUpperCase(),
+    itemDesc  : (document.getElementById('me-item').value.trim()    || '-').toUpperCase(),
+    lotNo     : (document.getElementById('me-lot').value.trim()     || '-').toUpperCase(),
+    qty       : Number(document.getElementById('me-qty').value) || 0,
+    note      : document.getElementById('me-note').value
+  };
+  if (editCaller === 'adm') {
+    updates.status = document.getElementById('me-status').value;
+  }
+
+  window.fb.updateDoc(window.fb.doc(window.db, 'tac', editId), updates)
+    .then(function() {
+      closeModal();
+      if (editCaller === 'adm') loadADMData(); else loadCMData();
+    })
+    .catch(function(e) { alert('Gagal simpan: ' + e.message); })
+    .finally(function() { btn.disabled = false; btn.textContent = '💾 SIMPAN'; });
+}
+
+// ── HAPUS ──
+function hapusData(id, caller) {
+  var rec = caller === 'cm'
+    ? cmData.find(function(r){ return r._id === id; })
+    : allData.find(function(r){ return r._id === id; });
+  delId = id;
+  delCaller = caller;
+  document.getElementById('del-info').textContent =
+    'Item: ' + (rec ? rec.itemDesc : id) + ' — tindakan ini tidak dapat dibatalkan.';
+  document.getElementById('modal-del').style.display = 'flex';
+}
+
+function closeDelModal() {
+  document.getElementById('modal-del').style.display = 'none';
+  delId = null;
+}
+
+function konfirmasiHapus() {
+  if (!delId) return;
+  var btn = document.getElementById('btn-del-ok');
+  btn.disabled = true; btn.textContent = 'MENGHAPUS...';
+  window.fb.deleteDoc(window.fb.doc(window.db, 'tac', delId))
+    .then(function() {
+      closeDelModal();
+      if (delCaller === 'adm') loadADMData(); else loadCMData();
+    })
+    .catch(function(e) { alert('Gagal hapus: ' + e.message); })
+    .finally(function() { btn.disabled = false; btn.textContent = 'YA, HAPUS'; });
 }
 
 // ── BADGE ──
@@ -690,6 +836,9 @@ document.addEventListener('ready', function() {
 
 document.getElementById('modal').addEventListener('click', function(e) {
   if (e.target === this) closeModal();
+});
+document.getElementById('modal-del').addEventListener('click', function(e) {
+  if (e.target === this) closeDelModal();
 });
 
 document.addEventListener('keydown', function(e) {
