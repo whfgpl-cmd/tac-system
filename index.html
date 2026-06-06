@@ -17,13 +17,16 @@ button:hover{opacity:.8;}
 button:disabled{opacity:.4;cursor:not-allowed;}
 table{width:100%;border-collapse:collapse;font-size:13px;}
 th{background:#000;color:#fff;padding:7px 8px;text-align:left;white-space:nowrap;}
-td{padding:7px 8px;border-bottom:1px solid #ddd;vertical-align:middle;white-space:nowrap;}
+td{padding:7px 8px;border-bottom:1px solid #ddd;vertical-align:middle;}
 tr:hover td{background:#f5f5f5;}
 .page{display:none;}
 .page.on{display:flex;flex-direction:column;min-height:100vh;}
 .topbar{background:#000;color:#fff;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
 .topbar strong{font-size:15px;}
-.topbar span{font-size:12px;opacity:.7;}
+.topbar-left{display:flex;align-items:center;gap:10px;}
+.topbar-right{display:flex;align-items:center;gap:12px;}
+.btn-hamburger{background:none;border:none;color:#fff;font-size:20px;cursor:pointer;padding:2px 6px;line-height:1;display:flex;flex-direction:column;gap:4px;justify-content:center;}
+.btn-hamburger span{display:block;width:22px;height:2px;background:#fff;border-radius:2px;transition:all .25s;}
 .fgroup{margin-bottom:10px;}
 .flabel{display:block;font-size:12px;margin-bottom:4px;font-weight:bold;}
 .badge{display:inline-block;padding:2px 8px;font-size:12px;border:1px solid #000;font-weight:bold;}
@@ -40,13 +43,17 @@ tr:hover td{background:#f5f5f5;}
 .btn-icon.edt:hover{background:#f0f4ff;border-color:#336;}
 .act-cell{display:flex;gap:4px;align-items:center;}
 .layout{display:flex;flex:1;overflow:hidden;}
-.sidebar{width:180px;flex-shrink:0;background:#111;color:#fff;display:flex;flex-direction:column;}
-.sidebar-logo{padding:16px 14px;font-size:12px;opacity:.5;border-bottom:1px solid #333;letter-spacing:1px;}
+
+/* SIDEBAR */
+.sidebar{width:180px;flex-shrink:0;background:#111;color:#fff;display:flex;flex-direction:column;transition:width .25s ease;overflow:hidden;}
+.sidebar.closed{width:0;}
+.sidebar-logo{padding:16px 14px;font-size:12px;opacity:.5;border-bottom:1px solid #333;letter-spacing:1px;white-space:nowrap;}
 .sidebar-menu{list-style:none;padding:8px 0;flex:1;}
-.sidebar-menu li a{display:block;padding:10px 16px;color:#ccc;text-decoration:none;font-size:13px;cursor:pointer;}
+.sidebar-menu li a{display:block;padding:10px 16px;color:#ccc;text-decoration:none;font-size:13px;cursor:pointer;white-space:nowrap;}
 .sidebar-menu li a:hover{background:#222;color:#fff;}
 .sidebar-menu li a.active{background:#333;color:#fff;font-weight:bold;border-left:3px solid #fff;}
 .sidebar-menu li .menu-icon{margin-right:8px;}
+
 .main-content{flex:1;overflow-y:auto;padding:20px;}
 h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom:6px;}
 .row{display:flex;gap:10px;flex-wrap:wrap;}
@@ -58,9 +65,12 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
 .filter-row{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px;}
 .filter-row .fgroup{margin-bottom:0;min-width:140px;}
 .opt-label{font-weight:normal;color:#888;font-size:11px;}
-.search-bar{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center;}
-.search-bar input{max-width:240px;}
-.action-by{font-size:11px;color:#555;white-space:nowrap;}
+
+/* TOOLBAR */
+.toolbar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center;}
+.search-wrap{display:flex;gap:0;flex:1;min-width:180px;max-width:340px;}
+.search-wrap input{border-right:none;border-radius:0;}
+.search-wrap button{border-radius:0;padding:6px 12px;white-space:nowrap;flex-shrink:0;}
 </style>
 </head>
 <body>
@@ -76,7 +86,7 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
     </div>
     <div class="fgroup">
       <label class="flabel">EMAIL</label>
-      <input id="l-email" type="email" value="cellman@tac.app" style="text-transform:none">
+      <input id="l-email" type="email" value="cellman@tac.app">
     </div>
     <div class="fgroup">
       <label class="flabel">PASSWORD</label>
@@ -90,14 +100,19 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
 <!-- CELLMAN -->
 <div class="page" id="pg-cellman">
   <div class="topbar">
-    <strong>TAC SYSTEM</strong>
-    <div style="display:flex;align-items:center;gap:12px;">
-      <span id="cm-name-label"></span>
+    <div class="topbar-left">
+      <button class="btn-hamburger" onclick="toggleSidebar('cm')" title="Buka/tutup menu">
+        <span></span><span></span><span></span>
+      </button>
+      <strong>TAC SYSTEM</strong>
+    </div>
+    <div class="topbar-right">
+      <span id="cm-name-label" style="font-size:12px;opacity:.7;"></span>
       <button onclick="doLogout()" style="padding:4px 10px;font-size:12px;">KELUAR</button>
     </div>
   </div>
   <div class="layout">
-    <div class="sidebar">
+    <div class="sidebar" id="cm-sidebar">
       <div class="sidebar-logo">MENU</div>
       <ul class="sidebar-menu">
         <li><a id="cm-menu-form" class="active" onclick="cmShowPage('form')"><span class="menu-icon">📝</span>FORM TAC</a></li>
@@ -106,75 +121,85 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
     </div>
     <div class="main-content">
 
+      <!-- FORM TAC -->
       <div id="cm-page-form">
         <h2>INPUT FORM TAC</h2>
         <div class="row">
           <div class="col">
-            <div class="fgroup"><label class="flabel">NAMA CELLMAN *</label>
-              <input type="text" id="cm-nama" placeholder="nama lengkap"></div>
+            <div class="fgroup">
+              <label class="flabel">NAMA CELLMAN *</label>
+              <input type="text" id="cm-nama" placeholder="nama lengkap">
+            </div>
           </div>
           <div class="col">
-            <div class="fgroup"><label class="flabel">TANGGAL *</label>
-              <input type="date" id="cm-tanggal"></div>
+            <div class="fgroup">
+              <label class="flabel">TANGGAL *</label>
+              <input type="date" id="cm-tanggal">
+            </div>
           </div>
           <div class="col">
-            <div class="fgroup"><label class="flabel">FROM SUB IO <span class="opt-label">(opsional)</span></label>
+            <div class="fgroup">
+              <label class="flabel">FROM SUB IO <span class="opt-label">(opsional)</span></label>
               <select id="cm-from-io">
                 <option value="">— pilih —</option>
-                <option>PLF-DISPUT</option><option>PLF-RETUR</option><option>PLF-PECAH</option>
-                <option>PLF-FG01</option><option>PLF-FG02</option><option>PLF-FG03</option>
-                <option>PLF-FG04</option><option>PLF-FG05</option><option>PLF-FG06</option>
-                <option>PLF-FG07</option><option>PLF-FG08</option><option>PLF-FG09</option>
-                <option>PLF-FG10</option><option>PLF-FG11</option><option>PLF-FG12</option>
-                <option>PLF-FG13</option><option>PLF-FG14</option><option>PLF-FG15</option>
-                <option>PLF-FG16</option><option>PLF-FG17</option><option>PLF-FG18</option>
-                <option>PLF-FG19</option><option>PLF-FG20</option>
-              </select></div>
+                <option>FG01</option><option>FG02</option><option>FG03</option>
+                <option>FG04</option><option>FG05</option><option>FG06</option>
+                <option>FG07</option><option>FG08</option><option>FG09</option>
+                <option>FG10</option><option>FG11</option><option>FG13</option>
+                <option>DISPUT</option>
+              </select>
+            </div>
           </div>
           <div class="col">
-            <div class="fgroup"><label class="flabel">TO SUB IO <span class="opt-label">(opsional)</span></label>
+            <div class="fgroup">
+              <label class="flabel">TO SUB IO <span class="opt-label">(opsional)</span></label>
               <select id="cm-to-io">
                 <option value="">— pilih —</option>
-                <option>PLF-DISPUT</option><option>PLF-RETUR</option><option>PLF-PECAH</option>
-                <option>PLF-FG01</option><option>PLF-FG02</option><option>PLF-FG03</option>
-                <option>PLF-FG04</option><option>PLF-FG05</option><option>PLF-FG06</option>
-                <option>PLF-FG07</option><option>PLF-FG08</option><option>PLF-FG09</option>
-                <option>PLF-FG10</option><option>PLF-FG11</option><option>PLF-FG12</option>
-                <option>PLF-FG13</option><option>PLF-FG14</option><option>PLF-FG15</option>
-                <option>PLF-FG16</option><option>PLF-FG17</option><option>PLF-FG18</option>
-                <option>PLF-FG19</option><option>PLF-FG20</option>
-              </select></div>
+                <option>FG01</option><option>FG02</option><option>FG03</option>
+                <option>FG04</option><option>FG05</option><option>FG06</option>
+                <option>FG07</option><option>FG08</option><option>FG09</option>
+                <option>FG10</option><option>FG11</option><option>FG13</option>
+                <option>DISPUT</option>
+              </select>
+            </div>
           </div>
         </div>
         <div class="row">
           <div class="col">
-            <div class="fgroup"><label class="flabel">ITEM DESC *</label>
-              <input type="text" id="cm-item" placeholder="nama item"></div>
+            <div class="fgroup">
+              <label class="flabel">ITEM DESC *</label>
+              <input type="text" id="cm-item" placeholder="nama item">
+            </div>
           </div>
           <div class="col">
-            <div class="fgroup"><label class="flabel">UKURAN MOTIF *</label>
+            <div class="fgroup">
+              <label class="flabel">UKURAN MOTIF *</label>
               <select id="cm-motif">
                 <option value="">— pilih —</option>
-                <option value="30x30">30x30</option>
-                <option value="40x40">40x40</option>
-                <option value="50x50">50x50</option>
-                <option value="60x60">60x60</option>
-                <option value="80x80">80x80</option>
-              </select></div>
+                <option>30x30</option><option>40x40</option><option>50x50</option>
+                <option>60x60</option><option>80x80</option>
+              </select>
+            </div>
           </div>
           <div class="col">
-            <div class="fgroup"><label class="flabel">LOT NO *</label>
-              <input type="text" id="cm-lot" placeholder="nomor lot"></div>
+            <div class="fgroup">
+              <label class="flabel">LOT NO *</label>
+              <input type="text" id="cm-lot" placeholder="nomor lot">
+            </div>
           </div>
           <div class="col">
-            <div class="fgroup"><label class="flabel">QTY *</label>
-              <input type="number" id="cm-qty" placeholder="0" min="0"></div>
+            <div class="fgroup">
+              <label class="flabel">QTY *</label>
+              <input type="number" id="cm-qty" placeholder="0" min="0">
+            </div>
           </div>
         </div>
         <div class="row">
-          <div class="col" style="max-width:300px;">
-            <div class="fgroup"><label class="flabel">NOTE *</label>
-              <input type="text" id="cm-note" placeholder="isi keterangan..."></div>
+          <div class="col" style="max-width:400px;">
+            <div class="fgroup">
+              <label class="flabel">NOTE *</label>
+              <input type="text" id="cm-note" placeholder="isi keterangan...">
+            </div>
           </div>
         </div>
         <div style="display:flex;gap:8px;margin-top:4px;">
@@ -184,18 +209,22 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
         <div id="cm-msg"></div>
 
         <h2 style="margin-top:24px;">RIWAYAT SAYA</h2>
-        <!-- SEARCH CELLMAN -->
-        <div class="search-bar">
-          <input id="cm-search" placeholder="🔍 cari item / lot / note..." oninput="renderCMTable()" style="max-width:260px;">
+        <!-- TOOLBAR CELLMAN -->
+        <div class="toolbar">
+          <div class="search-wrap">
+            <input id="cm-search" type="text" placeholder="cari nama / item / lot..." oninput="filterCMTable()">
+            <button onclick="filterCMTable()" title="Cari">🔍</button>
+          </div>
           <button onclick="loadCMData()" class="outline" style="font-size:12px;">↺ REFRESH</button>
         </div>
+
         <div style="overflow-x:auto;">
           <table>
             <thead>
               <tr>
-                <th>NO</th><th>NAMA</th><th>TANGGAL</th><th>FROM SUB IO</th><th>TO SUB IO</th>
-                <th>ITEM DESC</th><th>MOTIF</th><th>LOT NO</th><th>QTY</th><th>NOTE</th>
-                <th>STATUS ADMIN</th><th>ACTION BY</th><th>AKSI</th>
+                <th>NO</th><th>NAMA</th><th>TANGGAL</th><th>FROM SUB IO</th>
+                <th>TO SUB IO</th><th>ITEM DESC</th><th>MOTIF</th><th>LOT NO</th>
+                <th>QTY</th><th>NOTE</th><th>STATUS ADMIN</th><th>ACTION BY</th><th>AKSI</th>
               </tr>
             </thead>
             <tbody id="cm-tbody">
@@ -205,6 +234,7 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
         </div>
       </div>
 
+      <!-- REPORT CELLMAN -->
       <div id="cm-page-report" style="display:none;">
         <h2>REPORT</h2>
         <div class="report-box">
@@ -225,14 +255,19 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
 <!-- ADMIN -->
 <div class="page" id="pg-admin">
   <div class="topbar">
-    <strong>TAC SYSTEM — ADMIN</strong>
-    <div style="display:flex;align-items:center;gap:12px;">
-      <span id="adm-email-label"></span>
+    <div class="topbar-left">
+      <button class="btn-hamburger" onclick="toggleSidebar('adm')" title="Buka/tutup menu">
+        <span></span><span></span><span></span>
+      </button>
+      <strong>TAC SYSTEM — ADMIN</strong>
+    </div>
+    <div class="topbar-right">
+      <span id="adm-email-label" style="font-size:12px;opacity:.7;"></span>
       <button onclick="doLogout()" style="padding:4px 10px;font-size:12px;">KELUAR</button>
     </div>
   </div>
   <div class="layout">
-    <div class="sidebar">
+    <div class="sidebar" id="adm-sidebar">
       <div class="sidebar-logo">MENU</div>
       <ul class="sidebar-menu">
         <li><a id="adm-menu-data" class="active" onclick="admShowPage('data')"><span class="menu-icon">📋</span>DATA TAC</a></li>
@@ -241,11 +276,15 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
     </div>
     <div class="main-content">
 
+      <!-- DATA TAC -->
       <div id="adm-page-data">
         <h2>DATA TAC</h2>
-        <!-- SEARCH ADMIN - lebih lengkap -->
-        <div class="search-bar">
-          <input id="adm-search" placeholder="🔍 cari nama / item / lot / note / action by..." oninput="filterTable()" style="max-width:320px;">
+        <!-- TOOLBAR ADMIN -->
+        <div class="toolbar">
+          <div class="search-wrap">
+            <input id="adm-search" type="text" placeholder="cari nama / item / lot..." oninput="filterTable()">
+            <button onclick="filterTable()" title="Cari">🔍</button>
+          </div>
           <select id="adm-filter" onchange="filterTable()" style="width:130px;">
             <option value="">SEMUA STATUS</option>
             <option value="DRAFT">DRAFT</option>
@@ -253,28 +292,16 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
             <option value="POSTED">POSTED</option>
             <option value="DONE">DONE</option>
           </select>
-          <select id="adm-filter-io" onchange="filterTable()" style="width:140px;">
-            <option value="">SEMUA SUB IO</option>
-            <option>PLF-DISPUT</option><option>PLF-RETUR</option><option>PLF-PECAH</option>
-            <option>PLF-FG01</option><option>PLF-FG02</option><option>PLF-FG03</option>
-            <option>PLF-FG04</option><option>PLF-FG05</option><option>PLF-FG06</option>
-            <option>PLF-FG07</option><option>PLF-FG08</option><option>PLF-FG09</option>
-            <option>PLF-FG10</option><option>PLF-FG11</option><option>PLF-FG12</option>
-            <option>PLF-FG13</option><option>PLF-FG14</option><option>PLF-FG15</option>
-            <option>PLF-FG16</option><option>PLF-FG17</option><option>PLF-FG18</option>
-            <option>PLF-FG19</option><option>PLF-FG20</option>
-          </select>
           <button onclick="loadADMData()" class="outline" style="font-size:12px;">↺ REFRESH</button>
         </div>
-        <div style="font-size:12px;color:#888;margin-bottom:8px;" id="adm-count"></div>
         <div id="adm-msg"></div>
         <div style="overflow-x:auto;">
           <table>
             <thead>
               <tr>
-                <th>NO</th><th>NAMA</th><th>TANGGAL</th><th>FROM SUB IO</th><th>TO SUB IO</th>
-                <th>ITEM DESC</th><th>MOTIF</th><th>LOT NO</th><th>QTY</th><th>NOTE</th>
-                <th>STATUS ADMIN</th><th>ACTION BY</th><th>AKSI</th>
+                <th>NO</th><th>NAMA</th><th>TANGGAL</th><th>FROM SUB IO</th>
+                <th>TO SUB IO</th><th>ITEM DESC</th><th>MOTIF</th><th>LOT NO</th>
+                <th>QTY</th><th>NOTE</th><th>STATUS ADMIN</th><th>ACTION BY</th><th>AKSI</th>
               </tr>
             </thead>
             <tbody id="adm-tbody">
@@ -284,6 +311,7 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
         </div>
       </div>
 
+      <!-- REPORT ADMIN -->
       <div id="adm-page-report" style="display:none;">
         <h2>REPORT</h2>
         <div class="report-box">
@@ -296,10 +324,8 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
               <label class="flabel">STATUS</label>
               <select id="adm-rep-status" style="width:130px;">
                 <option value="">SEMUA</option>
-                <option value="DRAFT">DRAFT</option>
-                <option value="WAIT">WAIT</option>
-                <option value="POSTED">POSTED</option>
-                <option value="DONE">DONE</option>
+                <option value="DRAFT">DRAFT</option><option value="WAIT">WAIT</option>
+                <option value="POSTED">POSTED</option><option value="DONE">DONE</option>
               </select>
             </div>
             <button onclick="downloadExcelADM()">⬇ DOWNLOAD EXCEL</button>
@@ -316,55 +342,66 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
   <div style="background:#fff;border:2px solid #000;padding:24px;width:100%;max-width:560px;margin:16px;">
     <h2 style="margin-bottom:14px;">✏️ EDIT DATA TAC</h2>
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
-      <div class="fgroup" style="flex:1;min-width:140px;"><label class="flabel">NAMA</label>
-        <input type="text" id="me-nama"></div>
-      <div class="fgroup" style="flex:1;min-width:120px;"><label class="flabel">TANGGAL</label>
-        <input type="date" id="me-tanggal"></div>
+      <div class="fgroup" style="flex:1;min-width:140px;">
+        <label class="flabel">NAMA</label>
+        <input type="text" id="me-nama">
+      </div>
+      <div class="fgroup" style="flex:1;min-width:120px;">
+        <label class="flabel">TANGGAL</label>
+        <input type="date" id="me-tanggal">
+      </div>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
-      <div class="fgroup" style="flex:1;min-width:120px;"><label class="flabel">FROM SUB IO</label>
+      <div class="fgroup" style="flex:1;min-width:120px;">
+        <label class="flabel">FROM SUB IO</label>
         <select id="me-from-io">
           <option value="">— pilih —</option>
-          <option>PLF-DISPUT</option><option>PLF-RETUR</option><option>PLF-PECAH</option>
-          <option>PLF-FG01</option><option>PLF-FG02</option><option>PLF-FG03</option>
-          <option>PLF-FG04</option><option>PLF-FG05</option><option>PLF-FG06</option>
-          <option>PLF-FG07</option><option>PLF-FG08</option><option>PLF-FG09</option>
-          <option>PLF-FG10</option><option>PLF-FG11</option><option>PLF-FG12</option>
-          <option>PLF-FG13</option><option>PLF-FG14</option><option>PLF-FG15</option>
-          <option>PLF-FG16</option><option>PLF-FG17</option><option>PLF-FG18</option>
-          <option>PLF-FG19</option><option>PLF-FG20</option>
-        </select></div>
-      <div class="fgroup" style="flex:1;min-width:120px;"><label class="flabel">TO SUB IO</label>
+          <option>FG01</option><option>FG02</option><option>FG03</option>
+          <option>FG04</option><option>FG05</option><option>FG06</option>
+          <option>FG07</option><option>FG08</option><option>FG09</option>
+          <option>FG10</option><option>FG11</option><option>FG13</option>
+          <option>DISPUT</option>
+        </select>
+      </div>
+      <div class="fgroup" style="flex:1;min-width:120px;">
+        <label class="flabel">TO SUB IO</label>
         <select id="me-to-io">
           <option value="">— pilih —</option>
-          <option>PLF-DISPUT</option><option>PLF-RETUR</option><option>PLF-PECAH</option>
-          <option>PLF-FG01</option><option>PLF-FG02</option><option>PLF-FG03</option>
-          <option>PLF-FG04</option><option>PLF-FG05</option><option>PLF-FG06</option>
-          <option>PLF-FG07</option><option>PLF-FG08</option><option>PLF-FG09</option>
-          <option>PLF-FG10</option><option>PLF-FG11</option><option>PLF-FG12</option>
-          <option>PLF-FG13</option><option>PLF-FG14</option><option>PLF-FG15</option>
-          <option>PLF-FG16</option><option>PLF-FG17</option><option>PLF-FG18</option>
-          <option>PLF-FG19</option><option>PLF-FG20</option>
-        </select></div>
+          <option>FG01</option><option>FG02</option><option>FG03</option>
+          <option>FG04</option><option>FG05</option><option>FG06</option>
+          <option>FG07</option><option>FG08</option><option>FG09</option>
+          <option>FG10</option><option>FG11</option><option>FG13</option>
+          <option>DISPUT</option>
+        </select>
+      </div>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
-      <div class="fgroup" style="flex:1;min-width:140px;"><label class="flabel">ITEM DESC</label>
-        <input type="text" id="me-item"></div>
-      <div class="fgroup" style="flex:1;min-width:110px;"><label class="flabel">UKURAN MOTIF</label>
+      <div class="fgroup" style="flex:1;min-width:140px;">
+        <label class="flabel">ITEM DESC</label>
+        <input type="text" id="me-item">
+      </div>
+      <div class="fgroup" style="flex:1;min-width:110px;">
+        <label class="flabel">UKURAN MOTIF</label>
         <select id="me-motif">
           <option value="">— pilih —</option>
-          <option value="30x30">30x30</option><option value="40x40">40x40</option>
-          <option value="50x50">50x50</option><option value="60x60">60x60</option>
-          <option value="80x80">80x80</option>
-        </select></div>
-      <div class="fgroup" style="flex:1;min-width:100px;"><label class="flabel">LOT NO</label>
-        <input type="text" id="me-lot"></div>
-      <div class="fgroup" style="flex:1;min-width:70px;"><label class="flabel">QTY</label>
-        <input type="number" id="me-qty" min="0"></div>
+          <option>30x30</option><option>40x40</option><option>50x50</option>
+          <option>60x60</option><option>80x80</option>
+        </select>
+      </div>
+      <div class="fgroup" style="flex:1;min-width:100px;">
+        <label class="flabel">LOT NO</label>
+        <input type="text" id="me-lot">
+      </div>
+      <div class="fgroup" style="flex:1;min-width:70px;">
+        <label class="flabel">QTY</label>
+        <input type="number" id="me-qty" min="0">
+      </div>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
-      <div class="fgroup" style="flex:2;min-width:200px;"><label class="flabel">NOTE</label>
-        <input type="text" id="me-note"></div>
+      <div class="fgroup" style="flex:2;min-width:200px;">
+        <label class="flabel">NOTE</label>
+        <input type="text" id="me-note">
+      </div>
       <div class="fgroup" style="flex:1;min-width:130px;" id="me-status-wrap">
         <label class="flabel">STATUS ADMIN</label>
         <select id="me-status">
@@ -372,7 +409,8 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
           <option value="WAIT">WAIT</option>
           <option value="POSTED">POSTED</option>
           <option value="DONE">DONE</option>
-        </select></div>
+        </select>
+      </div>
     </div>
     <div style="display:flex;gap:8px;margin-top:12px;">
       <button id="btn-modal-save" onclick="saveEdit()" style="flex:1;">💾 SIMPAN</button>
@@ -395,7 +433,6 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
 </div>
 
 <script>
-// ── SUPABASE ──
 const SUPA_URL = 'https://addgggshvsvnzbzdbgnq.supabase.co';
 const SUPA_KEY = 'sb_publishable__xCcA-NNlTCRpF8K5c5LUw_k2I_1789';
 const { createClient } = supabase;
@@ -404,22 +441,26 @@ const db = createClient(SUPA_URL, SUPA_KEY);
 var role = 'cellman';
 var currentUser = null;
 var allData = [];
-var cmData  = [];
+var cmData = [];
 var editId = null;
 var editCaller = 'adm';
 var delId = null;
 var delCaller = 'adm';
 
-// ── ROLE ──
-function setRole(r) {
-  role = r;
-  document.getElementById('rb-cm').className  = r==='cellman' ? '' : 'outline';
-  document.getElementById('rb-adm').className = r==='admin'   ? '' : 'outline';
-  document.getElementById('l-email').value = r==='admin' ? 'admin@tac.app'    : 'cellman@tac.app';
-  document.getElementById('l-pass').value  = r==='admin' ? 'admin123'         : 'cellman123';
+// ── HAMBURGER SIDEBAR ──
+function toggleSidebar(who) {
+  var sb = document.getElementById(who + '-sidebar');
+  sb.classList.toggle('closed');
 }
 
-// ── LOGIN ──
+function setRole(r) {
+  role = r;
+  document.getElementById('rb-cm').className  = r === 'cellman' ? '' : 'outline';
+  document.getElementById('rb-adm').className = r === 'admin'   ? '' : 'outline';
+  document.getElementById('l-email').value = r === 'admin' ? 'admin@tac.app' : 'cellman@tac.app';
+  document.getElementById('l-pass').value  = r === 'admin' ? 'admin123'      : 'cellman123';
+}
+
 async function doLogin() {
   var email = document.getElementById('l-email').value.trim();
   var pass  = document.getElementById('l-pass').value;
@@ -433,10 +474,12 @@ async function doLogin() {
     currentUser = data.user;
     if (role === 'admin') {
       document.getElementById('adm-email-label').textContent = email;
-      show('pg-admin'); loadADMData();
+      show('pg-admin');
+      loadADMData();
     } else {
       document.getElementById('cm-name-label').textContent = email;
-      show('pg-cellman'); loadCMData();
+      show('pg-cellman');
+      loadCMData();
     }
   } catch(e) {
     err.innerHTML = '<div class="msg err">Email / password salah</div>';
@@ -445,7 +488,10 @@ async function doLogin() {
   }
 }
 
-async function doLogout() { await db.auth.signOut(); show('pg-login'); }
+async function doLogout() {
+  await db.auth.signOut();
+  show('pg-login');
+}
 
 function show(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
@@ -453,26 +499,28 @@ function show(id) {
 }
 
 function cmShowPage(p) {
-  document.getElementById('cm-page-form').style.display   = p==='form'   ? '' : 'none';
-  document.getElementById('cm-page-report').style.display = p==='report' ? '' : 'none';
-  document.getElementById('cm-menu-form').className   = p==='form'   ? 'active' : '';
-  document.getElementById('cm-menu-report').className = p==='report' ? 'active' : '';
-  if (p==='form') loadCMData();
+  document.getElementById('cm-page-form').style.display   = p === 'form'   ? '' : 'none';
+  document.getElementById('cm-page-report').style.display = p === 'report' ? '' : 'none';
+  document.getElementById('cm-menu-form').className   = p === 'form'   ? 'active' : '';
+  document.getElementById('cm-menu-report').className = p === 'report' ? 'active' : '';
+  if (p === 'form') loadCMData();
 }
 
 function admShowPage(p) {
-  document.getElementById('adm-page-data').style.display   = p==='data'   ? '' : 'none';
-  document.getElementById('adm-page-report').style.display = p==='report' ? '' : 'none';
-  document.getElementById('adm-menu-data').className   = p==='data'   ? 'active' : '';
-  document.getElementById('adm-menu-report').className = p==='report' ? 'active' : '';
+  document.getElementById('adm-page-data').style.display   = p === 'data'   ? '' : 'none';
+  document.getElementById('adm-page-report').style.display = p === 'report' ? '' : 'none';
+  document.getElementById('adm-menu-data').className   = p === 'data'   ? 'active' : '';
+  document.getElementById('adm-menu-report').className = p === 'report' ? 'active' : '';
 }
 
 function genNo() {
   var d = new Date();
-  return 'TAC-'+String(d.getFullYear()).slice(2)+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0')+'-'+String(Math.floor(Math.random()*9000)+1000);
+  var yy = String(d.getFullYear()).slice(2);
+  var mm = String(d.getMonth()+1).padStart(2,'0');
+  var dd = String(d.getDate()).padStart(2,'0');
+  return 'TAC-' + yy + mm + dd + '-' + String(Math.floor(Math.random()*9000)+1000);
 }
 
-// ── CELLMAN SUBMIT ──
 async function submitTAC() {
   var nama    = document.getElementById('cm-nama').value.trim();
   var tanggal = document.getElementById('cm-tanggal').value;
@@ -482,150 +530,160 @@ async function submitTAC() {
   var qty     = document.getElementById('cm-qty').value;
   var note    = document.getElementById('cm-note').value.trim();
 
-  if (!nama||!tanggal||!item||!motif||!lot||!qty||!note) {
-    document.getElementById('cm-msg').innerHTML = '<div class="msg err">Semua field (*) wajib diisi termasuk Ukuran Motif dan Note</div>';
+  if (!nama || !tanggal || !item || !motif || !lot || !qty || !note) {
+    document.getElementById('cm-msg').innerHTML = '<div class="msg err">Semua field wajib (*) harus diisi termasuk Ukuran Motif dan Note</div>';
     return;
   }
   var btn = document.getElementById('btn-cm-submit');
   btn.disabled = true; btn.textContent = 'MENGIRIM...';
 
   var payload = {
-    no_tx      : genNo(),
-    nama       : nama.toUpperCase(),
-    tanggal    : tanggal,
-    from_sub_io: document.getElementById('cm-from-io').value || '-',
-    to_sub_io  : document.getElementById('cm-to-io').value   || '-',
-    item_desc  : item.toUpperCase(),
-    motif      : motif,
-    lot_no     : lot.toUpperCase(),
-    qty        : Number(qty),
-    note       : note.toUpperCase(),
-    status     : 'DRAFT',
-    action_by  : '',
-    created_by : currentUser ? currentUser.email : ''
+    no_tx       : genNo(),
+    nama        : nama.toUpperCase(),
+    tanggal     : tanggal,
+    from_sub_io : document.getElementById('cm-from-io').value || '-',
+    to_sub_io   : document.getElementById('cm-to-io').value   || '-',
+    item_desc   : item.toUpperCase(),
+    motif       : motif,
+    lot_no      : lot.toUpperCase(),
+    qty         : Number(qty),
+    note        : note.toUpperCase(),
+    status      : 'DRAFT',
+    created_by  : currentUser ? currentUser.email : '',
+    action_by   : null,
+    action_at   : null
   };
 
   try {
     const { error } = await db.from('tac').insert(payload);
     if (error) throw error;
     document.getElementById('cm-msg').innerHTML = '<div class="msg ok">✓ Data berhasil dikirim</div>';
-    clearCMForm(); loadCMData();
+    clearCMForm();
+    loadCMData();
   } catch(e) {
-    document.getElementById('cm-msg').innerHTML = '<div class="msg err">Gagal: '+e.message+'</div>';
+    document.getElementById('cm-msg').innerHTML = '<div class="msg err">Gagal: ' + e.message + '</div>';
   } finally {
     btn.disabled = false; btn.textContent = 'KIRIM';
   }
 }
 
 function clearCMForm() {
-  ['cm-nama','cm-item','cm-lot','cm-qty','cm-note'].forEach(id => document.getElementById(id).value='');
+  ['cm-nama','cm-item','cm-lot','cm-qty','cm-note'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('cm-from-io').value = '';
   document.getElementById('cm-to-io').value   = '';
   document.getElementById('cm-motif').value   = '';
 }
 
-// ── CELLMAN LOAD ──
 async function loadCMData() {
   var email = currentUser ? currentUser.email : '';
-  const { data, error } = await db.from('tac').select('*').eq('created_by',email).order('created_at',{ascending:false});
+  const { data, error } = await db.from('tac')
+    .select('*').eq('created_by', email).order('created_at', { ascending: false });
   if (error) { console.error(error); return; }
   cmData = data || [];
-  renderCMTable();
+  filterCMTable();
 }
 
-function renderCMTable() {
-  var search = (document.getElementById('cm-search').value||'').toLowerCase();
-  var rows = cmData.filter(function(r) {
-    if (!search) return true;
-    return (r.item_desc||'').toLowerCase().includes(search) ||
-           (r.lot_no||'').toLowerCase().includes(search)    ||
-           (r.note||'').toLowerCase().includes(search)      ||
-           (r.nama||'').toLowerCase().includes(search)      ||
-           (r.tanggal||'').includes(search);
-  });
+// ── FILTER CELLMAN (search lokal) ──
+function filterCMTable() {
+  var search = (document.getElementById('cm-search').value || '').toLowerCase();
+  var filtered = search
+    ? cmData.filter(r =>
+        (r.nama||'').toLowerCase().includes(search) ||
+        (r.item_desc||'').toLowerCase().includes(search) ||
+        (r.lot_no||'').toLowerCase().includes(search) ||
+        (r.note||'').toLowerCase().includes(search)
+      )
+    : cmData;
+  renderCMTable(filtered);
+}
+
+function renderCMTable(rows) {
+  rows = rows || cmData;
   var html = '';
-  rows.forEach(function(r,i) {
-    html += '<tr>'+
-      '<td>'+(i+1)+'</td>'+
-      '<td>'+(r.nama||'-')+'</td>'+
-      '<td>'+(r.tanggal||'-')+'</td>'+
-      '<td>'+(r.from_sub_io||'-')+'</td>'+
-      '<td>'+(r.to_sub_io||'-')+'</td>'+
-      '<td>'+(r.item_desc||'-')+'</td>'+
-      '<td>'+(r.motif||'-')+'</td>'+
-      '<td>'+(r.lot_no||'-')+'</td>'+
-      '<td>'+(r.qty||'-')+'</td>'+
-      '<td>'+(r.note||'-')+'</td>'+
-      '<td>'+badge(r.status)+'</td>'+
-      '<td class="action-by">'+(r.action_by||'-')+'</td>'+
-      '<td><div class="act-cell">'+
-        '<button class="btn-icon edt" onclick="openEditModal(\''+r.id+'\',\'cm\')">✏️</button>'+
-        '<button class="btn-icon del" onclick="hapusData(\''+r.id+'\',\'cm\')">🗑️</button>'+
+  rows.forEach(function(r, i) {
+    var actionBy = r.action_by
+      ? '<div>' + r.action_by + '</div><div style="font-size:11px;color:#888;">' + (r.action_at ? r.action_at.slice(0,16).replace('T',' ') : '') + '</div>'
+      : '<span style="color:#ccc;">—</span>';
+    html += '<tr>' +
+      '<td>' + (i+1) + '</td>' +
+      '<td>' + (r.nama||'-') + '</td>' +
+      '<td>' + (r.tanggal||'-') + '</td>' +
+      '<td>' + (r.from_sub_io||'-') + '</td>' +
+      '<td>' + (r.to_sub_io||'-') + '</td>' +
+      '<td>' + (r.item_desc||'-') + '</td>' +
+      '<td>' + (r.motif||'-') + '</td>' +
+      '<td>' + (r.lot_no||'-') + '</td>' +
+      '<td>' + (r.qty||'-') + '</td>' +
+      '<td>' + (r.note||'-') + '</td>' +
+      '<td>' + badge(r.status) + '</td>' +
+      '<td>' + actionBy + '</td>' +
+      '<td><div class="act-cell">' +
+        '<button class="btn-icon edt" onclick="openEditModal(\'' + r.id + '\',\'cm\')">✏️</button>' +
+        '<button class="btn-icon del" onclick="hapusData(\'' + r.id + '\',\'cm\')">🗑️</button>' +
       '</div></td></tr>';
   });
   document.getElementById('cm-tbody').innerHTML = html ||
-    '<tr><td colspan="13" style="text-align:center;padding:20px;color:#888;">— belum ada data —</td></tr>';
+    '<tr><td colspan="13" style="text-align:center;padding:20px;color:#888;">— tidak ada data —</td></tr>';
 }
 
-// ── ADMIN LOAD ──
 async function loadADMData() {
   document.getElementById('adm-msg').innerHTML = '';
-  const { data, error } = await db.from('tac').select('*').order('created_at',{ascending:false});
-  if (error) { document.getElementById('adm-msg').innerHTML='<div class="msg err">Error: '+error.message+'</div>'; return; }
+  const { data, error } = await db.from('tac')
+    .select('*').order('created_at', { ascending: false });
+  if (error) {
+    document.getElementById('adm-msg').innerHTML = '<div class="msg err">Error: ' + error.message + '</div>';
+    return;
+  }
   allData = data || [];
   filterTable();
 }
 
 function filterTable() {
-  var search = (document.getElementById('adm-search').value||'').toLowerCase();
+  var search = (document.getElementById('adm-search').value || '').toLowerCase();
   var fSt    = document.getElementById('adm-filter').value;
-  var fIo    = document.getElementById('adm-filter-io').value;
-
   var filtered = allData.filter(function(r) {
-    var ok = (!fSt || r.status===fSt) && (!fIo || r.from_sub_io===fIo || r.to_sub_io===fIo);
+    var ok = !fSt || r.status === fSt;
     if (search) ok = ok && (
-      (r.nama||'').toLowerCase().includes(search)      ||
+      (r.nama||'').toLowerCase().includes(search) ||
       (r.item_desc||'').toLowerCase().includes(search) ||
-      (r.lot_no||'').toLowerCase().includes(search)    ||
-      (r.note||'').toLowerCase().includes(search)      ||
-      (r.action_by||'').toLowerCase().includes(search) ||
-      (r.tanggal||'').includes(search)
+      (r.lot_no||'').toLowerCase().includes(search) ||
+      (r.note||'').toLowerCase().includes(search)
     );
     return ok;
   });
-
-  // update count
-  document.getElementById('adm-count').textContent = 'Menampilkan ' + filtered.length + ' dari ' + allData.length + ' data';
-
   var html = '';
-  filtered.forEach(function(r,i) {
-    html += '<tr>'+
-      '<td>'+(i+1)+'</td>'+
-      '<td>'+(r.nama||'-')+'</td>'+
-      '<td>'+(r.tanggal||'-')+'</td>'+
-      '<td>'+(r.from_sub_io||'-')+'</td>'+
-      '<td>'+(r.to_sub_io||'-')+'</td>'+
-      '<td>'+(r.item_desc||'-')+'</td>'+
-      '<td>'+(r.motif||'-')+'</td>'+
-      '<td>'+(r.lot_no||'-')+'</td>'+
-      '<td>'+(r.qty||'-')+'</td>'+
-      '<td>'+(r.note||'-')+'</td>'+
-      '<td>'+badge(r.status)+'</td>'+
-      '<td class="action-by">'+(r.action_by||'-')+'</td>'+
-      '<td><div class="act-cell">'+
-        '<button class="btn-icon edt" onclick="openEditModal(\''+r.id+'\',\'adm\')">✏️</button>'+
-        '<button class="btn-icon del" onclick="hapusData(\''+r.id+'\',\'adm\')">🗑️</button>'+
+  filtered.forEach(function(r, i) {
+    var actionBy = r.action_by
+      ? '<div>' + r.action_by + '</div><div style="font-size:11px;color:#888;">' + (r.action_at ? r.action_at.slice(0,16).replace('T',' ') : '') + '</div>'
+      : '<span style="color:#ccc;">—</span>';
+    html += '<tr>' +
+      '<td>' + (i+1) + '</td>' +
+      '<td>' + (r.nama||'-') + '</td>' +
+      '<td>' + (r.tanggal||'-') + '</td>' +
+      '<td>' + (r.from_sub_io||'-') + '</td>' +
+      '<td>' + (r.to_sub_io||'-') + '</td>' +
+      '<td>' + (r.item_desc||'-') + '</td>' +
+      '<td>' + (r.motif||'-') + '</td>' +
+      '<td>' + (r.lot_no||'-') + '</td>' +
+      '<td>' + (r.qty||'-') + '</td>' +
+      '<td>' + (r.note||'-') + '</td>' +
+      '<td>' + badge(r.status) + '</td>' +
+      '<td>' + actionBy + '</td>' +
+      '<td><div class="act-cell">' +
+        '<button class="btn-icon edt" onclick="openEditModal(\'' + r.id + '\',\'adm\')">✏️</button>' +
+        '<button class="btn-icon del" onclick="hapusData(\'' + r.id + '\',\'adm\')">🗑️</button>' +
       '</div></td></tr>';
   });
   document.getElementById('adm-tbody').innerHTML = html ||
     '<tr><td colspan="13" style="text-align:center;padding:20px;color:#888;">— tidak ada data —</td></tr>';
 }
 
-// ── MODAL EDIT ──
 function openEditModal(id, caller) {
-  var rec = caller==='cm' ? cmData.find(r=>r.id===id) : allData.find(r=>r.id===id);
+  var rec = caller === 'cm'
+    ? cmData.find(r => r.id === id)
+    : allData.find(r => r.id === id);
   if (!rec) return;
-  editId=id; editCaller=caller;
+  editId = id; editCaller = caller;
   document.getElementById('me-nama').value    = rec.nama        || '';
   document.getElementById('me-tanggal').value = rec.tanggal     || '';
   document.getElementById('me-from-io').value = rec.from_sub_io || '';
@@ -636,145 +694,158 @@ function openEditModal(id, caller) {
   document.getElementById('me-qty').value     = rec.qty         || '';
   document.getElementById('me-note').value    = rec.note        || '';
   document.getElementById('me-status').value  = rec.status      || 'DRAFT';
-  document.getElementById('me-status-wrap').style.display = caller==='cm' ? 'none' : '';
+  document.getElementById('me-status-wrap').style.display = caller === 'cm' ? 'none' : '';
   document.getElementById('modal').style.display = 'flex';
 }
 
-function closeModal() { document.getElementById('modal').style.display='none'; editId=null; }
+function closeModal() {
+  document.getElementById('modal').style.display = 'none';
+  editId = null;
+}
 
 async function saveEdit() {
   if (!editId) return;
   var btn = document.getElementById('btn-modal-save');
-  btn.disabled=true; btn.textContent='MENYIMPAN...';
+  btn.disabled = true; btn.textContent = 'MENYIMPAN...';
 
   var updates = {
-    nama       : (document.getElementById('me-nama').value.trim()||'-').toUpperCase(),
-    tanggal    : document.getElementById('me-tanggal').value,
-    from_sub_io: document.getElementById('me-from-io').value||'-',
-    to_sub_io  : document.getElementById('me-to-io').value||'-',
-    item_desc  : (document.getElementById('me-item').value.trim()||'-').toUpperCase(),
-    motif      : document.getElementById('me-motif').value||'-',
-    lot_no     : (document.getElementById('me-lot').value.trim()||'-').toUpperCase(),
-    qty        : Number(document.getElementById('me-qty').value)||0,
-    note       : (document.getElementById('me-note').value.trim()||'-').toUpperCase()
+    nama        : (document.getElementById('me-nama').value.trim()    || '-').toUpperCase(),
+    tanggal     : document.getElementById('me-tanggal').value,
+    from_sub_io : document.getElementById('me-from-io').value || '-',
+    to_sub_io   : document.getElementById('me-to-io').value   || '-',
+    item_desc   : (document.getElementById('me-item').value.trim()    || '-').toUpperCase(),
+    motif       : document.getElementById('me-motif').value   || '-',
+    lot_no      : (document.getElementById('me-lot').value.trim()     || '-').toUpperCase(),
+    qty         : Number(document.getElementById('me-qty').value) || 0,
+    note        : (document.getElementById('me-note').value.trim()    || '-').toUpperCase()
   };
-
-  // ACTION BY — otomatis diisi email admin yang melakukan perubahan status
-  if (editCaller==='adm') {
+  if (editCaller === 'adm') {
     updates.status    = document.getElementById('me-status').value;
     updates.action_by = currentUser ? currentUser.email : '';
+    updates.action_at = new Date().toISOString();
   }
 
   try {
     const { error } = await db.from('tac').update(updates).eq('id', editId);
     if (error) throw error;
     closeModal();
-    if (editCaller==='adm') loadADMData(); else loadCMData();
+    if (editCaller === 'adm') loadADMData(); else loadCMData();
   } catch(e) {
-    alert('Gagal simpan: '+e.message);
+    alert('Gagal simpan: ' + e.message);
   } finally {
-    btn.disabled=false; btn.textContent='💾 SIMPAN';
+    btn.disabled = false; btn.textContent = '💾 SIMPAN';
   }
 }
 
-// ── HAPUS ──
 function hapusData(id, caller) {
-  var rec = caller==='cm' ? cmData.find(r=>r.id===id) : allData.find(r=>r.id===id);
-  delId=id; delCaller=caller;
-  document.getElementById('del-info').textContent = 'Item: '+(rec?rec.item_desc:id)+' — tidak dapat dibatalkan.';
+  var rec = caller === 'cm'
+    ? cmData.find(r => r.id === id)
+    : allData.find(r => r.id === id);
+  delId = id; delCaller = caller;
+  document.getElementById('del-info').textContent =
+    'Item: ' + (rec ? rec.item_desc : id) + ' — tindakan ini tidak dapat dibatalkan.';
   document.getElementById('modal-del').style.display = 'flex';
 }
 
-function closeDelModal() { document.getElementById('modal-del').style.display='none'; delId=null; }
+function closeDelModal() {
+  document.getElementById('modal-del').style.display = 'none';
+  delId = null;
+}
 
 async function konfirmasiHapus() {
   if (!delId) return;
   var btn = document.getElementById('btn-del-ok');
-  btn.disabled=true; btn.textContent='MENGHAPUS...';
+  btn.disabled = true; btn.textContent = 'MENGHAPUS...';
   try {
-    const { error } = await db.from('tac').delete().eq('id',delId);
+    const { error } = await db.from('tac').delete().eq('id', delId);
     if (error) throw error;
     closeDelModal();
-    if (delCaller==='adm') loadADMData(); else loadCMData();
-  } catch(e) { alert('Gagal hapus: '+e.message); }
-  finally { btn.disabled=false; btn.textContent='YA, HAPUS'; }
+    if (delCaller === 'adm') loadADMData(); else loadCMData();
+  } catch(e) {
+    alert('Gagal hapus: ' + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'YA, HAPUS';
+  }
 }
 
-// ── BADGE ──
 function badge(s) {
-  var cls={DRAFT:'draft',WAIT:'wait',POSTED:'posted',DONE:'done'}[s]||'draft';
-  return '<span class="badge '+cls+'">'+(s||'DRAFT')+'</span>';
+  var cls = { DRAFT:'draft', WAIT:'wait', POSTED:'posted', DONE:'done' }[s] || 'draft';
+  return '<span class="badge ' + cls + '">' + (s||'DRAFT') + '</span>';
 }
 
-// ── EXCEL ──
 function buildExcelData(rows) {
-  var h=['NO','NAMA','TANGGAL','FROM SUB IO','TO SUB IO','ITEM DESC','UKURAN MOTIF','LOT NO','QTY','NOTE','STATUS ADMIN','ACTION BY'];
-  var d=[h];
-  rows.forEach(function(r,i){
-    d.push([i+1,r.nama||'-',r.tanggal||'-',r.from_sub_io||'-',r.to_sub_io||'-',
-      r.item_desc||'-',r.motif||'-',r.lot_no||'-',r.qty||'-',r.note||'-',r.status||'-',r.action_by||'-']);
+  var headers = ['NO','NAMA','TANGGAL','FROM SUB IO','TO SUB IO','ITEM DESC','UKURAN MOTIF','LOT NO','QTY','NOTE','STATUS ADMIN','ACTION BY','ACTION AT'];
+  var data = [headers];
+  rows.forEach(function(r, i) {
+    data.push([
+      i+1, r.nama||'-', r.tanggal||'-', r.from_sub_io||'-', r.to_sub_io||'-',
+      r.item_desc||'-', r.motif||'-', r.lot_no||'-', r.qty||'-', r.note||'-',
+      r.status||'-', r.action_by||'-',
+      r.action_at ? r.action_at.slice(0,16).replace('T',' ') : '-'
+    ]);
   });
-  return d;
+  return data;
 }
 
 function exportExcel(data, filename) {
   var wb = XLSX.utils.book_new();
   var ws = XLSX.utils.aoa_to_sheet(data);
-  ws['!cols']=[{wch:5},{wch:20},{wch:12},{wch:12},{wch:12},{wch:22},{wch:12},{wch:14},{wch:8},{wch:20},{wch:14},{wch:22}];
-  XLSX.utils.book_append_sheet(wb,ws,'DATA TAC');
-  XLSX.writeFile(wb,filename);
+  ws['!cols'] = [{wch:5},{wch:20},{wch:12},{wch:12},{wch:12},{wch:22},{wch:12},{wch:14},{wch:8},{wch:20},{wch:12},{wch:24},{wch:18}];
+  XLSX.utils.book_append_sheet(wb, ws, 'DATA TAC');
+  XLSX.writeFile(wb, filename);
 }
 
 async function downloadExcelCM() {
-  var dari=document.getElementById('cm-rep-dari').value;
-  var sampai=document.getElementById('cm-rep-sampai').value;
-  var msg=document.getElementById('cm-rep-msg');
-  msg.innerHTML='<div class="msg ok">⏳ Mengambil data...</div>';
-  var email=currentUser?currentUser.email:'';
-  let q=db.from('tac').select('*').eq('created_by',email).order('created_at',{ascending:false});
-  if(dari)   q=q.gte('tanggal',dari);
-  if(sampai) q=q.lte('tanggal',sampai);
-  const {data,error}=await q;
-  if(error){msg.innerHTML='<div class="msg err">Gagal: '+error.message+'</div>';return;}
-  if(!data||!data.length){msg.innerHTML='<div class="msg err">Tidak ada data</div>';return;}
-  var now=new Date().toISOString().slice(0,10).replace(/-/g,'');
-  exportExcel(buildExcelData(data),'TAC_SAYA_'+now+'.xlsx');
-  msg.innerHTML='<div class="msg ok">✓ Berhasil didownload ('+data.length+' baris)</div>';
+  var dari = document.getElementById('cm-rep-dari').value;
+  var sampai = document.getElementById('cm-rep-sampai').value;
+  var msg = document.getElementById('cm-rep-msg');
+  msg.innerHTML = '<div class="msg ok">⏳ Mengambil data...</div>';
+  var email = currentUser ? currentUser.email : '';
+  let q = db.from('tac').select('*').eq('created_by', email).order('created_at', { ascending: false });
+  if (dari)   q = q.gte('tanggal', dari);
+  if (sampai) q = q.lte('tanggal', sampai);
+  const { data, error } = await q;
+  if (error) { msg.innerHTML = '<div class="msg err">Gagal: ' + error.message + '</div>'; return; }
+  if (!data || !data.length) { msg.innerHTML = '<div class="msg err">Tidak ada data untuk periode ini</div>'; return; }
+  var now = new Date().toISOString().slice(0,10).replace(/-/g,'');
+  exportExcel(buildExcelData(data), 'TAC_SAYA_' + now + '.xlsx');
+  msg.innerHTML = '<div class="msg ok">✓ File berhasil didownload (' + data.length + ' baris)</div>';
 }
 
 async function downloadExcelADM() {
-  var dari=document.getElementById('adm-rep-dari').value;
-  var sampai=document.getElementById('adm-rep-sampai').value;
-  var fSt=document.getElementById('adm-rep-status').value;
-  var msg=document.getElementById('adm-rep-msg');
-  msg.innerHTML='<div class="msg ok">⏳ Mengambil data...</div>';
-  let q=db.from('tac').select('*').order('created_at',{ascending:false});
-  if(dari)   q=q.gte('tanggal',dari);
-  if(sampai) q=q.lte('tanggal',sampai);
-  if(fSt)    q=q.eq('status',fSt);
-  const {data,error}=await q;
-  if(error){msg.innerHTML='<div class="msg err">Gagal: '+error.message+'</div>';return;}
-  if(!data||!data.length){msg.innerHTML='<div class="msg err">Tidak ada data</div>';return;}
-  var now=new Date().toISOString().slice(0,10).replace(/-/g,'');
-  exportExcel(buildExcelData(data),'TAC_ALL_'+now+'.xlsx');
-  msg.innerHTML='<div class="msg ok">✓ Berhasil didownload ('+data.length+' baris)</div>';
+  var dari = document.getElementById('adm-rep-dari').value;
+  var sampai = document.getElementById('adm-rep-sampai').value;
+  var fSt = document.getElementById('adm-rep-status').value;
+  var msg = document.getElementById('adm-rep-msg');
+  msg.innerHTML = '<div class="msg ok">⏳ Mengambil data...</div>';
+  let q = db.from('tac').select('*').order('created_at', { ascending: false });
+  if (dari)   q = q.gte('tanggal', dari);
+  if (sampai) q = q.lte('tanggal', sampai);
+  if (fSt)    q = q.eq('status', fSt);
+  const { data, error } = await q;
+  if (error) { msg.innerHTML = '<div class="msg err">Gagal: ' + error.message + '</div>'; return; }
+  if (!data || !data.length) { msg.innerHTML = '<div class="msg err">Tidak ada data untuk filter ini</div>'; return; }
+  var now = new Date().toISOString().slice(0,10).replace(/-/g,'');
+  exportExcel(buildExcelData(data), 'TAC_ALL_' + now + '.xlsx');
+  msg.innerHTML = '<div class="msg ok">✓ File berhasil didownload (' + data.length + ' baris)</div>';
 }
 
-// ── INIT ──
 window.addEventListener('load', function() {
   document.getElementById('cm-tanggal').value = new Date().toISOString().slice(0,10);
-  var today=new Date().toISOString().slice(0,10);
-  var first=today.slice(0,8)+'01';
-  document.getElementById('cm-rep-dari').value   =first;
-  document.getElementById('cm-rep-sampai').value =today;
-  document.getElementById('adm-rep-dari').value  =first;
-  document.getElementById('adm-rep-sampai').value=today;
+  var today    = new Date().toISOString().slice(0,10);
+  var firstDay = today.slice(0,8) + '01';
+  document.getElementById('cm-rep-dari').value    = firstDay;
+  document.getElementById('cm-rep-sampai').value  = today;
+  document.getElementById('adm-rep-dari').value   = firstDay;
+  document.getElementById('adm-rep-sampai').value = today;
 });
 
-document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
-document.getElementById('modal-del').addEventListener('click',function(e){if(e.target===this)closeDelModal();});
-document.addEventListener('keydown',function(e){
-  if(e.key==='Enter'&&document.getElementById('pg-login').classList.contains('on')) doLogin();
+document.getElementById('modal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+document.getElementById('modal-del').addEventListener('click', function(e) { if (e.target === this) closeDelModal(); });
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && document.getElementById('pg-login').classList.contains('on')) doLogin();
+  if (e.key === 'Enter' && document.getElementById('cm-search') === document.activeElement) filterCMTable();
+  if (e.key === 'Enter' && document.getElementById('adm-search') === document.activeElement) filterTable();
 });
 </script>
 </body>
