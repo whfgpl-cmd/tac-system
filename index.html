@@ -412,6 +412,12 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
         </select>
       </div>
     </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;" id="me-actionby-wrap">
+      <div class="fgroup" style="flex:1;min-width:200px;">
+        <label class="flabel">ACTION BY <span style="font-weight:normal;color:#888;font-size:11px;">(nama admin — isi manual)</span></label>
+        <input type="text" id="me-action-by" placeholder="contoh: Ahmad">
+      </div>
+    </div>
     <div style="display:flex;gap:8px;margin-top:12px;">
       <button id="btn-modal-save" onclick="saveEdit()" style="flex:1;">💾 SIMPAN</button>
       <button onclick="closeModal()" class="outline" style="flex:1;">BATAL</button>
@@ -694,7 +700,9 @@ function openEditModal(id, caller) {
   document.getElementById('me-qty').value     = rec.qty         || '';
   document.getElementById('me-note').value    = rec.note        || '';
   document.getElementById('me-status').value  = rec.status      || 'DRAFT';
-  document.getElementById('me-status-wrap').style.display = caller === 'cm' ? 'none' : '';
+  document.getElementById('me-action-by').value = rec.action_by   || '';
+  document.getElementById('me-status-wrap').style.display    = caller === 'cm' ? 'none' : '';
+  document.getElementById('me-actionby-wrap').style.display  = caller === 'cm' ? 'none' : '';
   document.getElementById('modal').style.display = 'flex';
 }
 
@@ -721,7 +729,8 @@ async function saveEdit() {
   };
   if (editCaller === 'adm') {
     updates.status    = document.getElementById('me-status').value;
-    updates.action_by = currentUser ? currentUser.email : '';
+    var actionName    = document.getElementById('me-action-by').value.trim();
+    updates.action_by = actionName ? actionName.toUpperCase() : (currentUser ? currentUser.email : '');
     updates.action_at = new Date().toISOString();
   }
 
