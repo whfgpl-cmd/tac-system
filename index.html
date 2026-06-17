@@ -155,13 +155,13 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
           </div>
           <div class="col">
             <div class="fgroup">
-              <label class="flabel">FROM SUB IO <span class="opt-label">(opsional)</span></label>
+              <label class="flabel">FROM SUB IO <span class="opt-label"> *</span></label>
               <div class="sdd-wrap" id="sdd-cm-from"></div>
             </div>
           </div>
           <div class="col">
             <div class="fgroup">
-              <label class="flabel">TO SUB IO <span class="opt-label">(opsional)</span></label>
+              <label class="flabel">TO SUB IO <span class="opt-label"> *</span></label>
               <div class="sdd-wrap" id="sdd-cm-to"></div>
             </div>
           </div>
@@ -191,7 +191,7 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
           </div>
         </div>
         <div style="display:flex;gap:8px;margin-top:4px;">
-          <button id="btn-cm-submit" onclick="submitTAC()">KIRIM</button>
+          <button id="btn-cm-submit" onclick="submitTAC()">SEND</button>
           <button onclick="clearCMForm()" class="outline">DELETE</button>
         </div>
         <div id="cm-msg"></div>
@@ -224,7 +224,7 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
         <div class="report-box">
           <h3>📥 DOWNLOAD DATA</h3>
           <p style="font-size:12px;color:#555;margin-bottom:12px;">Report Tac (.xlsx)</p>
-          <div class="filter-row">
+          <div class="filter-row"css>
             <div class="fgroup"><label class="flabel">FROM DATE</label><input type="date" id="cm-rep-dari"></div>
             <div class="fgroup"><label class="flabel">TO DATE</label><input type="date" id="cm-rep-sampai"></div>
             <button onclick="downloadExcelCM()">⬇ DOWNLOAD DATA</button>
