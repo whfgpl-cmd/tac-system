@@ -335,7 +335,6 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
             <option value="">SEMUA STATUS</option>
             <option value="DRAFT">DRAFT</option>
             <option value="WAIT">WAIT</option>
-            <option value="POSTED">POSTED</option>
             <option value="DONE">DONE</option>
           </select>
           <button onclick="loadADMData()" class="outline" style="font-size:12px;">↺ REFRESH</button>
@@ -371,7 +370,7 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
               <select id="adm-rep-status" style="width:130px;">
                 <option value="">SEMUA</option>
                 <option value="DRAFT">DRAFT</option><option value="WAIT">WAIT</option>
-                <option value="POSTED">POSTED</option><option value="DONE">DONE</option>
+                <option value="DONE">DONE</option>
               </select>
             </div>
             <button onclick="downloadExcelADM()">⬇ DOWNLOAD EXCEL</button>
@@ -453,7 +452,6 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
         <select id="me-status">
           <option value="DRAFT">DRAFT</option>
           <option value="WAIT">WAIT</option>
-          <option value="POSTED">POSTED</option>
           <option value="DONE">DONE</option>
         </select>
       </div>
@@ -850,7 +848,7 @@ async function konfirmasiHapus() {
 }
 
 function badge(s) {
-  var cls = { DRAFT:'draft', WAIT:'wait', POSTED:'posted', DONE:'done' }[s] || 'draft';
+  var cls = { DRAFT:'draft', WAIT:'wait', DONE:'done' }[s] || 'draft';
   return '<span class="badge ' + cls + '">' + (s||'DRAFT') + '</span>';
 }
 
