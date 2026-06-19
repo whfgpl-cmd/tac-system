@@ -81,9 +81,82 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
 .submenu li a{padding:8px 16px 8px 38px;font-size:12px;color:#aaa;}
 .submenu li a:hover{background:#1a1a1a;color:#fff;}
 .submenu li a.active{background:#262626;color:#fff;font-weight:bold;border-left:3px solid #fff;}
+/* ══ MOBILE RESPONSIVE ══ */
+@media (max-width: 640px) {
+
+  /* Sidebar: overlay saat dibuka di HP */
+  .sidebar{
+    position:fixed;top:0;left:0;height:100vh;
+    z-index:200;width:0;transition:width .25s ease;
+  }
+  .sidebar.open-mobile{ width:220px; }
+  .sidebar.closed{ width:0; }
+
+  /* Overlay gelap saat sidebar terbuka */
+  .sidebar-overlay{
+    display:none;position:fixed;inset:0;
+    background:rgba(0,0,0,.45);z-index:199;
+  }
+  .sidebar-overlay.show{ display:block; }
+
+  /* Layout */
+  .layout{ overflow:visible; }
+  .main-content{ padding:12px;overflow-y:auto; }
+
+  /* Topbar */
+  .topbar{ padding:8px 12px; }
+  .topbar strong{ font-size:13px; }
+  .topbar-right span{ display:none; }
+
+  /* Form: 1 kolom */
+  .row{ flex-direction:column;gap:0; }
+  .row .col{ min-width:100%; }
+
+  /* Tabel */
+  table{ font-size:11px; }
+  th,td{ padding:5px 6px; }
+
+  /* Toolbar */
+  .toolbar{ flex-direction:column;align-items:stretch; }
+  .search-wrap{ max-width:100%; }
+
+  /* Filter row */
+  .filter-row{ flex-direction:column; }
+  .filter-row .fgroup{ min-width:100%; }
+  .filter-row button{ width:100%; }
+
+  /* Modal full screen */
+  #modal > div{
+    margin:0;max-width:100%;width:100%;
+    min-height:100vh;border-radius:0;
+    border-left:none;border-right:none;
+    overflow-y:auto;padding:16px;
+  }
+  #modal-del > div{ margin:16px;max-width:calc(100% - 32px); }
+
+  /* Report box */
+  .report-box{ padding:12px; }
+  .badge{ font-size:10px;padding:1px 5px; }
+  h2{ font-size:13px; }
+
+  /* Touch target lebih besar */
+  input,select{ padding:9px 8px;font-size:15px; }
+  button{ padding:9px 14px;font-size:14px; }
+}
+
+/* Tablet */
+@media (min-width:641px) and (max-width:900px){
+  .sidebar{ width:160px; }
+  .main-content{ padding:14px; }
+  .row .col{ min-width:140px; }
+  table{ font-size:12px; }
+}
 </style>
 </head>
 <body>
+
+<!-- MOBILE SIDEBAR OVERLAY -->
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeMobileSidebar()"></div>
 
 <!-- LOGIN -->
 <div class="page on" id="pg-login">
@@ -133,7 +206,7 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
           </a>
           <ul class="submenu open" id="cm-submenu-form">
             <li><a id="cm-sub-form-tac" class="active" onclick="cmShowPage('form-tac')">Form TAC</a></li>
-            <li><a id="cm-sub-form-brg" onclick="cmShowPage('form-brg')">Form Brg Bermasalah</a></li>
+            <li><a id="cm-sub-form-brg" onclick="cmShowPage('form-brg')">Form Barang Bermasalah</a></li>
           </ul>
         </li>
         <!-- REPORT (parent dengan submenu) -->
@@ -144,7 +217,7 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
           </a>
           <ul class="submenu" id="cm-submenu-report">
             <li><a id="cm-sub-report-tac" onclick="cmShowPage('report-tac')">Report TAC</a></li>
-            <li><a id="cm-sub-report-brg" onclick="cmShowPage('report-brg')">Report Brg Bermasalah</a></li>
+            <li><a id="cm-sub-report-brg" onclick="cmShowPage('report-brg')">Report Barang Bermasalah</a></li>
           </ul>
         </li>
       </ul>
@@ -169,7 +242,7 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
           </div>
           <div class="col">
             <div class="fgroup">
-              <label class="flabel">FROM SUB IO <span class="opt-label"></span></label>
+              <label class="flabel">FROM SUB IO <span class="opt-label">(opsional)</span></label>
               <select id="cm-from-io">
                 <option value="">— pilih —</option>
                 <option>FG01</option><option>FG02</option><option>FG03</option>
@@ -182,7 +255,7 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
           </div>
           <div class="col">
             <div class="fgroup">
-              <label class="flabel">TO SUB IO <span class="opt-label"></span></label>
+              <label class="flabel">TO SUB IO <span class="opt-label">(opsional)</span></label>
               <select id="cm-to-io">
                 <option value="">— pilih —</option>
                 <option>FG01</option><option>FG02</option><option>FG03</option>
@@ -266,7 +339,7 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
 
       <!-- FORM BARANG BERMASALAH (placeholder) -->
       <div id="cm-page-form-brg" style="display:none;">
-        <h2>FORM BARANG BERMASALAH</h2>
+        <h2>INPUT FORM BARANG BERMASALAH</h2>
         <div class="msg ok" style="max-width:480px;">
           📋 Form ini belum dikonfigurasi. Field dan struktur data untuk Barang Bermasalah akan ditambahkan kemudian.
         </div>
@@ -276,11 +349,11 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
       <div id="cm-page-report-tac" style="display:none;">
         <h2>REPORT TAC</h2>
         <div class="report-box">
-          <h3>📥 DOWNLOAD DATA(.XLSX)</h3>
-          <p style="font-size:12px;color:#555;margin-bottom:12px;">Download data (.xlsx)</p>
+          <h3>📥 DOWNLOAD .XLSX</h3>
+          <p style="font-size:12px;color:#555;margin-bottom:12px;">Download semua data TAC (.xlsx)</p>
           <div class="filter-row">
-            <div class="fgroup"><label class="flabel">FROM DATE</label><input type="date" id="cm-rep-dari"></div>
-            <div class="fgroup"><label class="flabel">TO DATE</label><input type="date" id="cm-rep-sampai"></div>
+            <div class="fgroup"><label class="flabel">from</label><input type="date" id="cm-rep-dari"></div>
+            <div class="fgroup"><label class="flabel">To</label><input type="date" id="cm-rep-sampai"></div>
             <button onclick="downloadExcelCM()">⬇ DOWNLOAD</button>
           </div>
           <div id="cm-rep-msg"></div>
@@ -335,6 +408,7 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
             <option value="">SEMUA STATUS</option>
             <option value="DRAFT">DRAFT</option>
             <option value="WAIT">WAIT</option>
+            <option value="POSTED">POSTED</option>
             <option value="DONE">DONE</option>
           </select>
           <button onclick="loadADMData()" class="outline" style="font-size:12px;">↺ REFRESH</button>
@@ -360,20 +434,20 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
       <div id="adm-page-report" style="display:none;">
         <h2>REPORT</h2>
         <div class="report-box">
-          <h3>📥 DOWNLOAD DATA (.xlsx)</h3>
+          <h3>📥 DOWNLOAD (EXCEL)</h3>
           <p style="font-size:12px;color:#555;margin-bottom:12px;">Download semua data TAC (.xlsx)</p>
           <div class="filter-row">
-            <div class="fgroup"><label class="flabel">FROM DATE</label><input type="date" id="adm-rep-dari"></div>
-            <div class="fgroup"><label class="flabel">TO DATE</label><input type="date" id="adm-rep-sampai"></div>
+            <div class="fgroup"><label class="flabel">From</label><input type="date" id="adm-rep-dari"></div>
+            <div class="fgroup"><label class="flabel">To</label><input type="date" id="adm-rep-sampai"></div>
             <div class="fgroup">
               <label class="flabel">STATUS</label>
               <select id="adm-rep-status" style="width:130px;">
                 <option value="">SEMUA</option>
                 <option value="DRAFT">DRAFT</option><option value="WAIT">WAIT</option>
-                <option value="DONE">DONE</option>
+                <option value="POSTED">POSTED</option><option value="DONE">DONE</option>
               </select>
             </div>
-            <button onclick="downloadExcelADM()">⬇ DOWNLOAD EXCEL</button>
+            <button onclick="downloadExcelADM()">⬇ DOWNLOAD XLSX</button>
           </div>
           <div id="adm-rep-msg"></div>
         </div>
@@ -452,6 +526,7 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
         <select id="me-status">
           <option value="DRAFT">DRAFT</option>
           <option value="WAIT">WAIT</option>
+          <option value="POSTED">POSTED</option>
           <option value="DONE">DONE</option>
         </select>
       </div>
@@ -500,7 +575,26 @@ var delCaller = 'adm';
 // ── HAMBURGER SIDEBAR ──
 function toggleSidebar(who) {
   var sb = document.getElementById(who + '-sidebar');
-  sb.classList.toggle('closed');
+  var isMobile = window.innerWidth <= 640;
+  if (isMobile) {
+    var isOpen = sb.classList.contains('open-mobile');
+    if (isOpen) {
+      sb.classList.remove('open-mobile');
+      document.getElementById('sidebar-overlay').classList.remove('show');
+    } else {
+      sb.classList.add('open-mobile');
+      document.getElementById('sidebar-overlay').classList.add('show');
+    }
+  } else {
+    sb.classList.toggle('closed');
+  }
+}
+
+function closeMobileSidebar() {
+  document.querySelectorAll('.sidebar').forEach(function(sb) {
+    sb.classList.remove('open-mobile');
+  });
+  document.getElementById('sidebar-overlay').classList.remove('show');
 }
 
 function setRole(r) {
@@ -563,6 +657,7 @@ function toggleSubmenu(key) {
 // CELLMAN: 4 halaman (form-tac, form-brg, report-tac, report-brg)
 var cmPages = ['form-tac', 'form-brg', 'report-tac', 'report-brg'];
 function cmShowPage(p) {
+  if (window.innerWidth <= 640) closeMobileSidebar();
   cmPages.forEach(function(name) {
     var el = document.getElementById('cm-page-' + name);
     if (el) el.style.display = (name === p) ? '' : 'none';
@@ -583,6 +678,7 @@ function cmShowPage(p) {
 }
 
 function admShowPage(p) {
+  if (window.innerWidth <= 640) closeMobileSidebar();
   document.getElementById('adm-page-data').style.display   = p === 'data'   ? '' : 'none';
   document.getElementById('adm-page-report').style.display = p === 'report' ? '' : 'none';
   document.getElementById('adm-menu-data').className   = p === 'data'   ? 'active' : '';
@@ -848,7 +944,7 @@ async function konfirmasiHapus() {
 }
 
 function badge(s) {
-  var cls = { DRAFT:'draft', WAIT:'wait', DONE:'done' }[s] || 'draft';
+  var cls = { DRAFT:'draft', WAIT:'wait', POSTED:'posted', DONE:'done' }[s] || 'draft';
   return '<span class="badge ' + cls + '">' + (s||'DRAFT') + '</span>';
 }
 
