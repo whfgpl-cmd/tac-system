@@ -600,9 +600,7 @@ function closeMobileSidebar() {
 function setRole(r) {
   role = r;
   document.getElementById('rb-cm').className  = r === 'cellman' ? '' : 'outline';
-  document.getElementById('rb-adm').className = r === 'admin'   ? '' : 'outline';
-  document.getElementById('l-email').value = r === 'admin' ? 'admin@tac.app' : 'cellman@tac.app';
-  document.getElementById('l-pass').value  = r === 'admin' ? 'admin123'      : 'cellman123';
+  document.getElementById('rb-adm').className = r === 'admin'   ? '' : 'outline'
 }
 
 async function doLogin() {
