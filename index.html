@@ -169,11 +169,11 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
     </div>
     <div class="fgroup">
       <label class="flabel">EMAIL</label>
-      <input id="l-email" type="email" value="cellman@tac.app">
+      <input id="l-email" type="email" value="">
     </div>
     <div class="fgroup">
       <label class="flabel">PASSWORD</label>
-      <input id="l-pass" type="password" value="cellman123">
+      <input id="l-pass" type="password" value="">
     </div>
     <button id="btn-login" onclick="doLogin()" style="width:100%;margin-top:4px">MASUK</button>
     <div id="l-err"></div>
@@ -601,6 +601,8 @@ function setRole(r) {
   role = r;
   document.getElementById('rb-cm').className  = r === 'cellman' ? '' : 'outline';
   document.getElementById('rb-adm').className = r === 'admin'   ? '' : 'outline';
+  document.getElementById('l-email').value = r === 'admin' ? 'admin@tac.app' : 'cellman@tac.app';
+  document.getElementById('l-pass').value  = r === 'admin' ? 'admin123'      : 'cellman123';
 }
 
 async function doLogin() {
