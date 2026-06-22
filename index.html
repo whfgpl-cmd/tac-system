@@ -340,12 +340,91 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
       <!-- FORM BARANG BERMASALAH (placeholder) -->
       <div id="cm-page-form-brg" style="display:none;">
         <h2>INPUT FORM BARANG BERMASALAH</h2>
-        <div class="msg ok" style="max-width:480px;">
-          📋 Form ini belum dikonfigurasi. Field dan struktur data untuk Barang Bermasalah akan ditambahkan kemudian.
+
+      <div class="row">
+        <div class="col">
+            <div class="fgroup">
+                <label class="flabel">NAMA CELLMAN *</label>
+                <input type="text" id="brg-nama">
+            </div>
+        </div>
+        <div class="col">
+            <div class="fgroup">
+                <label class="flabel">TANGGAL *</label>
+                <input type="date" id="brg-tanggal">
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="fgroup">
+            <select id="brg-from-io">
+                <option value="">-pilih-</option>
+                <option>FG01</option>
+                <option>FG02</option>
+                <option>FG03</option>
+                <option>FG04</option>
+                <option>FG05</option>
+                <option>FG06</option>
+                <option>FG07</option>
+                <option>FG08</option>
+                <option>FG09</option>
+                <option>FG10</option>
+                <option>FG11</option>
+                <option>FG12</option>
+                <option>FG13</option>
+            </select>
+         </div>
         </div>
       </div>
 
-      <!-- REPORT TAC -->
+      <div class="row">
+        <div class="col">
+            <div class="fgroup">
+                <label class="flabel">ITEM DESC *</label>
+                <input type="text" id="brg-item">
+            </div>
+        </div>
+    
+      <div class="col">
+        <div class="fgroup">
+            <label class="flabel">UKURAN MOTIF *</label>
+            <select id="brg-motif">
+                <option value="">-pilih-</option>
+                <option>30x30</option>
+                <option>40x40</option>
+                <option>50x50</option>
+            </select>
+        </div>
+      </div>
+      <div class="col">
+        <div class="fgroup">
+            <label class="flabel">LOT NO *</label> 
+            <input type="text" id="brg-lot">
+        </div>
+      </div>
+      
+      <div class="col">
+        <div class="fgroup">
+            <label class="flabel">QTY *</label>
+            <input type="number" id="brg-qty">
+        </div>
+      </div>
+      </div>
+
+      <div class="row">
+        <div class="col">
+            <div class="fgroup">
+                <label class="flabel">REASON *</label>
+                <input type="text" id="brg-note">
+            </div>
+        </div>
+      </div>
+      
+      <button onclick="submitBRG()">SEND</button>
+      </div>
+
+      
+     <!-- REPORT TAC -->
       <div id="cm-page-report-tac" style="display:none;">
         <h2>REPORT TAC</h2>
         <div class="report-box">
@@ -753,6 +832,28 @@ async function loadCMData() {
   filterCMTable();
 }
 
+async function submitBRG(){
+    const payload = {
+        nama        : document.getElementById('brg-nama').value,
+        tanggal     : document.getElementById('brg-tanggal').value,
+        from_sub_io : document.getElementById('brg-to-io').value,
+        to_sub_io   : document.getElementById('brg-item').value,
+        item_desc   : document.getElementById('brg-motif').value,
+        motif       : document.getElementById('brg-lot').value,
+        qty         : document.getElementById('brg-qty').value,
+        note        : document.getElementById('brg-note').value,
+        status      : 'DRAFT'
+    };
+    const { error } = await db
+    .from('barang_bermasalah')
+    .insert(payload);
+
+    if(error){
+        alert(error.message);
+        return;
+    }
+    alert ('Data berhasil Disimpan');
+}
 // ── FILTER CELLMAN (search lokal) ──
 function filterCMTable() {
   var search = (document.getElementById('cm-search').value || '').toLowerCase();
