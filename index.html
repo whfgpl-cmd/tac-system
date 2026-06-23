@@ -918,7 +918,7 @@ async function submitTAC() {
   var lot     = document.getElementById('cm-lot').value.trim();
   var qty     = document.getElementById('cm-qty').value;
   var note    = document.getElementById('cm-note').value.trim();
-  if (!nama || !tanggal || !item || !lot || !qty || !note) {
+  if (!nama || !tanggal || !motif || !item || !lot || !qty || !note) {
     document.getElementById('cm-msg').innerHTML = '<div class="msg err">Semua field wajib (*) harus diisi termasuk Ukuran Motif dan Note</div>';
     return;
   }
@@ -931,7 +931,7 @@ async function submitTAC() {
     from_sub_io : document.getElementById('cm-from-io').value || '-',
     to_sub_io   : document.getElementById('cm-to-io').value   || '-',
     item_desc   : item.toUpperCase(),
-    uk_motif    : uk_motif,
+    uk_motif    : motif,
     lot_no      : lot.toUpperCase(),
     qty         : Number(qty),
     note        : note.toUpperCase(),
@@ -1014,7 +1014,7 @@ async function submitBRG() {
   var lot     = document.getElementById('brg-lot').value.trim();
   var qty     = document.getElementById('brg-qty').value;
   var note    = document.getElementById('brg-note').value.trim();
-  if (!nama || !tanggal || !subio || !item || !lot || !qty || !note) {
+  if (!nama || !tanggal || !subio || !motif || !item || !lot || !qty || !note) {
     document.getElementById('brg-msg').innerHTML = '<div class="msg err">Semua field wajib (*) harus diisi</div>';
     return;
   }
@@ -1025,7 +1025,7 @@ async function submitBRG() {
     tanggal     : tanggal,
     from_sub_io : subio,
     item_desc   : item.toUpperCase(),
-    uk_motif    : uk_motif,
+    uk_motif    : motif,
     lot_no      : lot.toUpperCase(),
     qty         : Number(qty),
     note        : note.toUpperCase()
