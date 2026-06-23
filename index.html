@@ -756,7 +756,6 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
         </select>
       </div>
     </div>
-    
 
 <!-- MODAL HAPUS -->
 <div id="modal-del" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;">
@@ -1033,15 +1032,16 @@ async function submitBRG() {
   var btn = document.getElementById('btn-brg-submit');
   btn.disabled = true; btn.textContent = 'MENGIRIM...';
   var payload = {
-    nama        : nama.toUpperCase(),
-    tanggal     : tanggal,
-    from_sub_io : subio,
-    item_desc   : item.toUpperCase(),
-    uk_motif    : motif,
-    lot_no      : lot.toUpperCase(),
-    qty         : Number(qty),
-    note        : note.toUpperCase()
-  };
+  nama        : nama.toUpperCase(),
+  tanggal     : tanggal,
+  from_sub_io : subio,
+  item_desc   : item.toUpperCase(),
+  uk_motif    : motif,
+  lot_no      : lot.toUpperCase(),
+  qty         : Number(qty),
+  note        : note.toUpperCase(),
+  created_by  : currentUser ? currentUser.email : ''   // ✅ tambahkan ini
+};
   try {
     const { error } = await db.from('barang_bermasalah').insert(payload);
     if (error) throw error;
