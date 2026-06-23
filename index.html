@@ -744,18 +744,7 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
         </select>
       </div>
     </div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;">
-      <div class="fgroup" style="flex:1;min-width:200px;">
-        <label class="flabel">ACTION BY <span style="font-weight:normal;color:#888;font-size:11px;">(nama admin — isi manual)</span></label>
-        <input type="text" id="mbrg-action-by" placeholder="contoh: Ahmad">
-      </div>
-    </div>
-    <div style="display:flex;gap:8px;margin-top:12px;">
-      <button id="btn-modal-brg-save" onclick="saveEditBRG()" style="flex:1;">💾 SIMPAN</button>
-      <button onclick="closeModalBRG()" class="outline" style="flex:1;">BATAL</button>
-    </div>
-  </div>
-</div>
+    
 
 <!-- MODAL HAPUS -->
 <div id="modal-del" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;">
@@ -1039,11 +1028,7 @@ async function submitBRG() {
     motif       : motif,
     lot_no      : lot.toUpperCase(),
     qty         : Number(qty),
-    note        : note.toUpperCase(),
-    status      : 'DRAFT',
-    created_by  : currentUser ? currentUser.email : '',
-    action_by   : null,
-    action_at   : null
+    note        : note.toUpperCase()
   };
   try {
     const { error } = await db.from('barang_bermasalah').insert(payload);
@@ -1364,7 +1349,7 @@ function buildExcelData(rows) {
 }
 
 function buildExcelDataBRG(rows) {
-  var headers = ['NO','NAMA','TANGGAL','SUBINVENTORY','UKURAN MOTIF','ITEM DESC','LOT NO','QTY','REASON','STATUS','ACTION BY','ACTION AT'];
+  var headers = ['NO','NAMA','TANGGAL','SUBINVENTORY','UKURAN MOTIF','ITEM DESC','LOT NO','QTY'];
   var data = [headers];
   rows.forEach(function(r, i) {
     data.push([
