@@ -291,7 +291,7 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
             <thead>
               <tr>
                 <th>NO</th><th>NAMA</th><th>TANGGAL</th><th>FROM SUB IO</th>
-                <th>TO SUB IO</th><th>ITEM DESC</th><th>MOTIF</th><th>LOT NO</th>
+                <th>TO SUB IO</th><th>UK</th><th>ITEM DESC</th><th>LOT NO</th>
                 <th>QTY</th><th>NOTE</th><th>STATUS ADMIN</th><th>ACTION BY</th>
               </tr>
             </thead>
@@ -388,8 +388,8 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
           <table>
             <thead>
               <tr>
-                <th>NO</th><th>NAMA</th><th>TANGGAL</th><th>SUB I</th>
-                <th>ITEM DESC</th><th>MOTIF</th><th>LOT NO</th><th>QTY</th>
+                <th>NO</th><th>NAMA</th><th>TANGGAL</th><th>SUBINVENTORY</th><th>UK</th>
+                <th>ITEM DESC</th><th>LOT NO</th><th>QTY</th>
                 <th>REASON</th><th>STATUS</th><th>ACTION BY</th>
               </tr>
             </thead>
@@ -499,7 +499,7 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
             <thead>
               <tr>
                 <th>NO</th><th>NAMA</th><th>TANGGAL</th><th>FROM SUB IO</th>
-                <th>TO SUB IO</th><th>ITEM DESC</th><th>MOTIF</th><th>LOT NO</th>
+                <th>TO SUB IO</th><th>UK</th><th>ITEM DESC</th><th>LOT NO</th>
                 <th>QTY</th><th>NOTE</th><th>STATUS ADMIN</th><th>ACTION BY</th>
               </tr>
             </thead>
@@ -531,8 +531,8 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
           <table>
             <thead>
               <tr>
-                <th>NO</th><th>NAMA</th><th>TANGGAL</th><th>SUBINVENTORY</th>
-                <th>ITEM DESC</th><th>MOTIF</th><th>LOT NO</th><th>QTY</th>
+                <th>NO</th><th>NAMA</th><th>TANGGAL</th><th>SUBINVENTORY</th><th>UK</th>
+                <th>ITEM DESC</th><th>LOT NO</th><th>QTY</th>
                 <th>REASON</th><th>STATUS</th><th>ACTION BY</th>
               </tr>
             </thead>
@@ -918,7 +918,7 @@ async function submitTAC() {
   var lot     = document.getElementById('cm-lot').value.trim();
   var qty     = document.getElementById('cm-qty').value;
   var note    = document.getElementById('cm-note').value.trim();
-  if (!nama || !tanggal || !item || !motif || !lot || !qty || !note) {
+  if (!nama || !tanggal || !item || !lot || !qty || !note) {
     document.getElementById('cm-msg').innerHTML = '<div class="msg err">Semua field wajib (*) harus diisi termasuk Ukuran Motif dan Note</div>';
     return;
   }
@@ -931,7 +931,7 @@ async function submitTAC() {
     from_sub_io : document.getElementById('cm-from-io').value || '-',
     to_sub_io   : document.getElementById('cm-to-io').value   || '-',
     item_desc   : item.toUpperCase(),
-    motif       : motif,
+    uk_motif    : uk_motif,
     lot_no      : lot.toUpperCase(),
     qty         : Number(qty),
     note        : note.toUpperCase(),
@@ -991,7 +991,7 @@ function renderCMTable(rows) {
     html += '<tr>' +
       '<td>' + (i+1) + '</td><td>' + (r.nama||'-') + '</td><td>' + (r.tanggal||'-') + '</td>' +
       '<td>' + (r.from_sub_io||'-') + '</td><td>' + (r.to_sub_io||'-') + '</td>' +
-      '<td>' + (r.item_desc||'-') + '</td><td>' + (r.motif||'-') + '</td>' +
+      '<td>' + (r.item_desc||'-') + '</td><td>' + (r.uk_motif||'-') + '</td>' +
       '<td>' + (r.lot_no||'-') + '</td><td>' + (r.qty||'-') + '</td>' +
       '<td>' + (r.note||'-') + '</td><td>' + badge(r.status) + '</td>' +
       '<td>' + actionBy + '</td>' +
@@ -1014,7 +1014,7 @@ async function submitBRG() {
   var lot     = document.getElementById('brg-lot').value.trim();
   var qty     = document.getElementById('brg-qty').value;
   var note    = document.getElementById('brg-note').value.trim();
-  if (!nama || !tanggal || !subio || !item || !motif || !lot || !qty || !note) {
+  if (!nama || !tanggal || !subio || !item || !lot || !qty || !note) {
     document.getElementById('brg-msg').innerHTML = '<div class="msg err">Semua field wajib (*) harus diisi</div>';
     return;
   }
@@ -1025,7 +1025,7 @@ async function submitBRG() {
     tanggal     : tanggal,
     from_sub_io : subio,
     item_desc   : item.toUpperCase(),
-    motif       : motif,
+    uk_motif    : uk_motif,
     lot_no      : lot.toUpperCase(),
     qty         : Number(qty),
     note        : note.toUpperCase()
@@ -1079,7 +1079,7 @@ function renderBRGTable(rows, tbodyId, caller) {
     html += '<tr>' +
       '<td>' + (i+1) + '</td><td>' + (r.nama||'-') + '</td><td>' + (r.tanggal||'-') + '</td>' +
       '<td>' + (r.from_sub_io||'-') + '</td><td>' + (r.item_desc||'-') + '</td>' +
-      '<td>' + (r.motif||'-') + '</td><td>' + (r.lot_no||'-') + '</td>' +
+      '<td>' + (r.uk_motif||'-') + '</td><td>' + (r.lot_no||'-') + '</td>' +
       '<td>' + (r.qty||'-') + '</td><td>' + (r.note||'-') + '</td>' +
       '<td>' + badge(r.status) + '</td><td>' + actionBy + '</td>' +
       '<td><div class="act-cell">' +
@@ -1125,7 +1125,7 @@ function filterTable() {
     html += '<tr>' +
       '<td>' + (i+1) + '</td><td>' + (r.nama||'-') + '</td><td>' + (r.tanggal||'-') + '</td>' +
       '<td>' + (r.from_sub_io||'-') + '</td><td>' + (r.to_sub_io||'-') + '</td>' +
-      '<td>' + (r.item_desc||'-') + '</td><td>' + (r.motif||'-') + '</td>' +
+      '<td>' + (r.item_desc||'-') + '</td><td>' + (r.uk_motif||'-') + '</td>' +
       '<td>' + (r.lot_no||'-') + '</td><td>' + (r.qty||'-') + '</td>' +
       '<td>' + (r.note||'-') + '</td><td>' + badge(r.status) + '</td>' +
       '<td>' + actionBy + '</td>' +
@@ -1179,7 +1179,7 @@ function openEditModal(id, caller) {
   document.getElementById('me-from-io').value = rec.from_sub_io || '';
   document.getElementById('me-to-io').value   = rec.to_sub_io   || '';
   document.getElementById('me-item').value    = rec.item_desc   || '';
-  document.getElementById('me-motif').value   = rec.motif       || '';
+  document.getElementById('me-uk-motif').value   = rec.uk_motif || '';
   document.getElementById('me-lot').value     = rec.lot_no      || '';
   document.getElementById('me-qty').value     = rec.qty         || '';
   document.getElementById('me-note').value    = rec.note        || '';
@@ -1205,7 +1205,7 @@ async function saveEdit() {
     from_sub_io : document.getElementById('me-from-io').value || '-',
     to_sub_io   : document.getElementById('me-to-io').value   || '-',
     item_desc   : (document.getElementById('me-item').value.trim() || '-').toUpperCase(),
-    motif       : document.getElementById('me-motif').value   || '-',
+    uk_motif    : document.getElementById('me-uk-motif').value   || '-',
     lot_no      : (document.getElementById('me-lot').value.trim()  || '-').toUpperCase(),
     qty         : Number(document.getElementById('me-qty').value) || 0,
     note        : (document.getElementById('me-note').value.trim() || '-').toUpperCase()
@@ -1239,7 +1239,7 @@ function openEditModalBRG(id, caller) {
   document.getElementById('mbrg-tanggal').value = rec.tanggal     || '';
   document.getElementById('mbrg-sub-io').value  = rec.from_sub_io || '';
   document.getElementById('mbrg-item').value    = rec.item_desc   || '';
-  document.getElementById('mbrg-motif').value   = rec.motif       || '';
+  document.getElementById('mbrg-uk-motif').value   = rec.uk_motif || '';
   document.getElementById('mbrg-lot').value     = rec.lot_no      || '';
   document.getElementById('mbrg-qty').value     = rec.qty         || '';
   document.getElementById('mbrg-note').value    = rec.note        || '';
@@ -1266,7 +1266,7 @@ async function saveEditBRG() {
     tanggal     : document.getElementById('mbrg-tanggal').value,
     from_sub_io : document.getElementById('mbrg-sub-io').value || '-',
     item_desc   : (document.getElementById('mbrg-item').value.trim() || '-').toUpperCase(),
-    motif       : document.getElementById('mbrg-motif').value  || '-',
+    uk_motif    : document.getElementById('mbrg-uk-motif').value  || '-',
     lot_no      : (document.getElementById('mbrg-lot').value.trim()  || '-').toUpperCase(),
     qty         : Number(document.getElementById('mbrg-qty').value) || 0,
     note        : (document.getElementById('mbrg-note').value.trim() || '-').toUpperCase()
@@ -1340,7 +1340,7 @@ function buildExcelData(rows) {
   rows.forEach(function(r, i) {
     data.push([
       i+1, r.nama||'-', r.tanggal||'-', r.from_sub_io||'-', r.to_sub_io||'-',
-      r.item_desc||'-', r.motif||'-', r.lot_no||'-', r.qty||'-', r.note||'-',
+      r.item_desc||'-', r.uk_motif||'-', r.lot_no||'-', r.qty||'-', r.note||'-',
       r.status||'-', r.action_by||'-',
       r.action_at ? r.action_at.slice(0,16).replace('T',' ') : '-'
     ]);
@@ -1354,7 +1354,7 @@ function buildExcelDataBRG(rows) {
   rows.forEach(function(r, i) {
     data.push([
       i+1, r.nama||'-', r.tanggal||'-', r.from_sub_io||'-',
-      r.item_desc||'-', r.motif||'-', r.lot_no||'-', r.qty||'-', r.note||'-',
+      r.item_desc||'-', r.uk_motif||'-', r.lot_no||'-', r.qty||'-', r.note||'-',
       r.status||'-', r.action_by||'-',
       r.action_at ? r.action_at.slice(0,16).replace('T',' ') : '-'
     ]);
