@@ -43,8 +43,6 @@ tr:hover td{background:#f5f5f5;}
 .btn-icon.edt:hover{background:#f0f4ff;border-color:#336;}
 .act-cell{display:flex;gap:4px;align-items:center;}
 .layout{display:flex;flex:1;overflow:hidden;}
-
-/* SIDEBAR */
 .sidebar{width:190px;flex-shrink:0;background:#111;color:#fff;display:flex;flex-direction:column;transition:width .25s ease;overflow:hidden;}
 .sidebar.closed{width:0;}
 .sidebar-logo{padding:16px 14px;font-size:12px;opacity:.5;border-bottom:1px solid #333;letter-spacing:1px;white-space:nowrap;}
@@ -53,7 +51,6 @@ tr:hover td{background:#f5f5f5;}
 .sidebar-menu li a:hover{background:#222;color:#fff;}
 .sidebar-menu li a.active{background:#333;color:#fff;font-weight:bold;border-left:3px solid #fff;}
 .sidebar-menu li .menu-icon{margin-right:8px;}
-
 .main-content{flex:1;overflow-y:auto;padding:20px;}
 h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom:6px;}
 .row{display:flex;gap:10px;flex-wrap:wrap;}
@@ -65,14 +62,10 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
 .filter-row{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px;}
 .filter-row .fgroup{margin-bottom:0;min-width:140px;}
 .opt-label{font-weight:normal;color:#888;font-size:11px;}
-
-/* TOOLBAR */
 .toolbar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center;}
 .search-wrap{display:flex;gap:0;flex:1;min-width:180px;max-width:340px;}
 .search-wrap input{border-right:none;border-radius:0;}
 .search-wrap button{border-radius:0;padding:6px 12px;white-space:nowrap;flex-shrink:0;}
-
-/* SUBMENU DROPDOWN SIDEBAR */
 .menu-parent{display:flex;align-items:center;justify-content:space-between;}
 .menu-parent .chevron{transition:transform .2s;font-size:11px;opacity:.6;}
 .menu-parent.expanded .chevron{transform:rotate(90deg);}
@@ -81,8 +74,6 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
 .submenu li a{padding:8px 16px 8px 38px;font-size:12px;color:#aaa;}
 .submenu li a:hover{background:#1a1a1a;color:#fff;}
 .submenu li a.active{background:#262626;color:#fff;font-weight:bold;border-left:3px solid #fff;}
-
-/* ══ MOBILE RESPONSIVE ══ */
 @media (max-width: 640px) {
   .sidebar{position:fixed;top:0;left:0;height:100vh;z-index:200;width:0;transition:width .25s ease;}
   .sidebar.open-mobile{width:220px;}
@@ -112,7 +103,6 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
   input,select{padding:9px 8px;font-size:15px;}
   button{padding:9px 14px;font-size:14px;}
 }
-
 @media (min-width:641px) and (max-width:900px){
   .sidebar{width:160px;}
   .main-content{padding:14px;}
@@ -123,7 +113,6 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
 </head>
 <body>
 
-<!-- MOBILE SIDEBAR OVERLAY -->
 <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeMobileSidebar()"></div>
 
 <!-- LOGIN -->
@@ -208,14 +197,14 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
           </div>
           <div class="col">
             <div class="fgroup">
-              <label class="flabel">FROM SUB IO <span class="opt-label"></span></label>
+              <label class="flabel">FROM SUB IO</label>
               <select id="cm-from-io">
                 <option value="">— pilih —</option>
                 <option>FG01</option><option>FG02</option><option>FG03</option>
                 <option>FG04</option><option>FG05</option><option>FG06</option>
                 <option>FG07</option><option>FG08</option><option>FG09</option>
                 <option>FG10</option><option>FG11</option><option>FG13</option>
-                <option>FG14</option><option>FG15</option><option>FG16></option>
+                <option>FG14</option><option>FG15</option><option>FG16</option>
                 <option>FG17</option><option>FG18</option><option>FG19</option>
                 <option>FG20</option><option>DISPUT</option>
               </select>
@@ -223,30 +212,28 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
           </div>
           <div class="col">
             <div class="fgroup">
-              <label class="flabel">TO SUB IO <span class="opt-label"></span></label>
+              <label class="flabel">TO SUB IO</label>
               <select id="cm-to-io">
                 <option value="">— pilih —</option>
                 <option>FG01</option><option>FG02</option><option>FG03</option>
                 <option>FG04</option><option>FG05</option><option>FG06</option>
                 <option>FG07</option><option>FG08</option><option>FG09</option>
                 <option>FG10</option><option>FG11</option><option>FG13</option>
-                <option>FG14</option><option>FG15</option><option>FG16></option>
+                <option>FG14</option><option>FG15</option><option>FG16</option>
                 <option>FG17</option><option>FG18</option><option>FG19</option>
                 <option>FG20</option><option>DISPUT</option>
               </select>
             </div>
           </div>
         </div>
-        <div class="col">
-            <div class="fgroup">
-              <label class="flabel">UKURAN MOTIF *</label>
-              <select id="cm-motif">
-                <option value="">— pilih —</option>
-                <option>30x30</option><option>40x40</option><option>50x50</option>
-                <option>60x60</option><option>80x80</option>
-              </select>
-            </div>
-          </div>
+        <div class="fgroup">
+          <label class="flabel">UKURAN MOTIF *</label>
+          <select id="cm-motif">
+            <option value="">— pilih —</option>
+            <option>30x30</option><option>40x40</option><option>50x50</option>
+            <option>60x60</option><option>80x80</option>
+          </select>
+        </div>
         <div class="row">
           <div class="col">
             <div class="fgroup">
@@ -254,7 +241,6 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
               <input type="text" id="cm-item" placeholder="nama item">
             </div>
           </div>
-          
           <div class="col">
             <div class="fgroup">
               <label class="flabel">LOT NO *</label>
@@ -295,8 +281,8 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
             <thead>
               <tr>
                 <th>NO</th><th>NAMA</th><th>TANGGAL</th><th>FROM SUB IO</th>
-                <th>TO SUB IO</th><th>UK</th><th>ITEM DESC</th><th>LOT NO</th>
-                <th>QTY</th><th>NOTE</th><th>STATUS ADMIN</th><th>ACTION BY</th>
+                <th>TO SUB IO</th><th>UK MOTIF</th><th>ITEM DESC</th><th>LOT NO</th>
+                <th>QTY</th><th>NOTE</th><th>STATUS</th><th>ACTION BY</th><th>AKSI</th>
               </tr>
             </thead>
             <tbody id="cm-tbody">
@@ -331,23 +317,21 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
                 <option>FG04</option><option>FG05</option><option>FG06</option>
                 <option>FG07</option><option>FG08</option><option>FG09</option>
                 <option>FG10</option><option>FG11</option><option>FG13</option>
-                <option>FG14</option><option>FG15</option><option>FG16></option>
+                <option>FG14</option><option>FG15</option><option>FG16</option>
                 <option>FG17</option><option>FG18</option><option>FG19</option>
                 <option>FG20</option><option>DISPUT</option>
               </select>
             </div>
           </div>
         </div>
-         <div class="col">
-            <div class="fgroup">
-              <label class="flabel">UKURAN MOTIF *</label>
-              <select id="brg-motif">
-                <option value="">— pilih —</option>
-                <option>30x30</option><option>40x40</option><option>50x50</option>
-                <option>60x60</option><option>80x80</option>
-              </select>
-            </div>
-          </div>
+        <div class="fgroup">
+          <label class="flabel">UKURAN MOTIF *</label>
+          <select id="brg-motif">
+            <option value="">— pilih —</option>
+            <option>30x30</option><option>40x40</option><option>50x50</option>
+            <option>60x60</option><option>80x80</option>
+          </select>
+        </div>
         <div class="row">
           <div class="col">
             <div class="fgroup">
@@ -394,9 +378,9 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
           <table>
             <thead>
               <tr>
-                <th>NO</th><th>NAMA</th><th>TANGGAL</th><th>SUBINVENTORY</th><th>UK</th>
+                <th>NO</th><th>NAMA</th><th>TANGGAL</th><th>SUBINVENTORY</th><th>UK MOTIF</th>
                 <th>ITEM DESC</th><th>LOT NO</th><th>QTY</th>
-                <th>REASON</th><th>STATUS</th><th>ACTION BY</th>
+                <th>REASON</th><th>STATUS</th><th>ACTION BY</th><th>AKSI</th>
               </tr>
             </thead>
             <tbody id="brg-tbody">
@@ -457,7 +441,6 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
     <div class="sidebar" id="adm-sidebar">
       <div class="sidebar-logo">MENU</div>
       <ul class="sidebar-menu">
-        <!-- DATA (parent dengan submenu) -->
         <li>
           <a id="adm-menu-data-parent" class="menu-parent expanded" onclick="toggleSubmenu('adm-data')">
             <span><span class="menu-icon">📋</span>DATA</span>
@@ -468,7 +451,6 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
             <li><a id="adm-sub-data-brg" onclick="admShowPage('data-brg')">Barang Bermasalah</a></li>
           </ul>
         </li>
-        <!-- REPORT (parent dengan submenu) -->
         <li>
           <a id="adm-menu-report-parent" class="menu-parent" onclick="toggleSubmenu('adm-report')">
             <span><span class="menu-icon">📊</span>REPORT</span>
@@ -505,8 +487,8 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
             <thead>
               <tr>
                 <th>NO</th><th>NAMA</th><th>TANGGAL</th><th>FROM SUB IO</th>
-                <th>TO SUB IO</th><th>UK</th><th>ITEM DESC</th><th>LOT NO</th>
-                <th>QTY</th><th>NOTE</th><th>STATUS ADMIN</th><th>ACTION BY</th>
+                <th>TO SUB IO</th><th>UK MOTIF</th><th>ITEM DESC</th><th>LOT NO</th>
+                <th>QTY</th><th>NOTE</th><th>STATUS</th><th>ACTION BY</th><th>AKSI</th>
               </tr>
             </thead>
             <tbody id="adm-tbody">
@@ -537,9 +519,9 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
           <table>
             <thead>
               <tr>
-                <th>NO</th><th>NAMA</th><th>TANGGAL</th><th>SUBINVENTORY</th><th>UK</th>
+                <th>NO</th><th>NAMA</th><th>TANGGAL</th><th>SUBINVENTORY</th><th>UK MOTIF</th>
                 <th>ITEM DESC</th><th>LOT NO</th><th>QTY</th>
-                <th>REASON</th><th>STATUS</th><th>ACTION BY</th>
+                <th>REASON</th><th>STATUS</th><th>ACTION BY</th><th>AKSI</th>
               </tr>
             </thead>
             <tbody id="adm-brg-tbody">
@@ -599,7 +581,10 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
   </div>
 </div>
 
-<!-- MODAL EDIT TAC -->
+<!-- ═══════════════════════════════════════════════════════
+     MODAL EDIT TAC
+     FIX Bug #2: id field motif diubah dari me-motif → me-uk-motif
+     ═══════════════════════════════════════════════════════ -->
 <div id="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:center;justify-content:center;overflow-y:auto;">
   <div style="background:#fff;border:2px solid #000;padding:24px;width:100%;max-width:560px;margin:16px;">
     <h2 style="margin-bottom:14px;">✏️ EDIT DATA TAC</h2>
@@ -622,7 +607,7 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
           <option>FG04</option><option>FG05</option><option>FG06</option>
           <option>FG07</option><option>FG08</option><option>FG09</option>
           <option>FG10</option><option>FG11</option><option>FG13</option>
-          <option>FG14</option><option>FG15</option><option>FG16></option>
+          <option>FG14</option><option>FG15</option><option>FG16</option>
           <option>FG17</option><option>FG18</option><option>FG19</option>
           <option>FG20</option><option>DISPUT</option>
         </select>
@@ -635,20 +620,21 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
           <option>FG04</option><option>FG05</option><option>FG06</option>
           <option>FG07</option><option>FG08</option><option>FG09</option>
           <option>FG10</option><option>FG11</option><option>FG13</option>
-          <option>FG14</option><option>FG15</option><option>FG16></option>
+          <option>FG14</option><option>FG15</option><option>FG16</option>
           <option>FG17</option><option>FG18</option><option>FG19</option>
           <option>FG20</option><option>DISPUT</option>
         </select>
       </div>
     </div>
-     <div class="fgroup" style="flex:1;min-width:110px;">
-        <label class="flabel">UKURAN MOTIF</label>
-        <select id="me-uk-motif">
-          <option value="">— pilih —</option>
-          <option>30x30</option><option>40x40</option><option>50x50</option>
-          <option>60x60</option><option>80x80</option>
-        </select>
-      </div>
+    <!-- FIX Bug #2: id="me-uk-motif" (sebelumnya me-motif) -->
+    <div class="fgroup">
+      <label class="flabel">UKURAN MOTIF</label>
+      <select id="me-uk-motif">
+        <option value="">— pilih —</option>
+        <option>30x30</option><option>40x40</option><option>50x50</option>
+        <option>60x60</option><option>80x80</option>
+      </select>
+    </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
       <div class="fgroup" style="flex:1;min-width:140px;">
         <label class="flabel">ITEM DESC</label>
@@ -677,7 +663,7 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
         </select>
       </div>
     </div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;" id="mbrg-actionby-wrap">
+    <div style="display:flex;gap:10px;flex-wrap:wrap;" id="me-actionby-wrap">
       <div class="fgroup" style="flex:1;min-width:200px;">
         <label class="flabel">ACTION BY <span style="font-weight:normal;color:#888;font-size:11px;">(nama admin — isi manual)</span></label>
         <input type="text" id="me-action-by" placeholder="contoh: Ahmad">
@@ -690,7 +676,11 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
   </div>
 </div>
 
-<!-- MODAL EDIT BARANG BERMASALAH (ADMIN) -->
+<!-- ═══════════════════════════════════════════════════════
+     MODAL EDIT BARANG BERMASALAH (ADMIN)
+     FIX Bug #1: div penutup modal-brg diperbaiki (sebelumnya modal-del ada di DALAM modal-brg)
+     FIX Bug #3: tambah id="mbrg-uk-motif" dan id="mbrg-action-by" yang hilang
+     ═══════════════════════════════════════════════════════ -->
 <div id="modal-brg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:center;justify-content:center;overflow-y:auto;">
   <div style="background:#fff;border:2px solid #000;padding:24px;width:100%;max-width:560px;margin:16px;">
     <h2 style="margin-bottom:14px;">✏️ EDIT BARANG BERMASALAH</h2>
@@ -712,13 +702,13 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
           <option>FG01</option><option>FG02</option><option>FG03</option>
           <option>FG04</option><option>FG05</option><option>FG06</option>
           <option>FG07</option><option>FG08</option><option>FG09</option>
-          <option>FG10</option><option>FG11</option><option>FG12</option>
-          <option>FG13</option><option>FG14</option>
-          <option>FG15</option><option>FG16></option><option>FG17<option>FG18</option><option>FG19</option>
+          <option>FG10</option><option>FG11</option><option>FG13</option>
+          <option>FG14</option><option>FG15</option><option>FG16</option>
+          <option>FG17</option><option>FG18</option><option>FG19</option>
           <option>FG20</option><option>DISPUT</option>
         </select>
       </div>
-       <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <!-- FIX Bug #3: id="mbrg-uk-motif" ditambahkan (sebelumnya tidak ada) -->
       <div class="fgroup" style="flex:1;min-width:110px;">
         <label class="flabel">UKURAN MOTIF</label>
         <select id="mbrg-uk-motif">
@@ -727,12 +717,12 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
           <option>60x60</option><option>80x80</option>
         </select>
       </div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
       <div class="fgroup" style="flex:1;min-width:140px;">
         <label class="flabel">ITEM DESC</label>
         <input type="text" id="mbrg-item">
       </div>
-    </div>
-   
       <div class="fgroup" style="flex:1;min-width:100px;">
         <label class="flabel">LOT NO</label>
         <input type="text" id="mbrg-lot">
@@ -747,7 +737,7 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
         <label class="flabel">REASON</label>
         <input type="text" id="mbrg-note">
       </div>
-      <div class="fgroup" style="flex:1;min-width:130px;">
+      <div class="fgroup" style="flex:1;min-width:130px;" id="mbrg-status-wrap">
         <label class="flabel">STATUS</label>
         <select id="mbrg-status">
           <option value="DRAFT">DRAFT</option>
@@ -756,7 +746,20 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
         </select>
       </div>
     </div>
+    <!-- FIX Bug #3: id="mbrg-action-by" ditambahkan (sebelumnya tidak ada di HTML) -->
+    <div style="display:flex;gap:10px;flex-wrap:wrap;" id="mbrg-actionby-wrap">
+      <div class="fgroup" style="flex:1;min-width:200px;">
+        <label class="flabel">ACTION BY <span style="font-weight:normal;color:#888;font-size:11px;">(nama admin — isi manual)</span></label>
+        <input type="text" id="mbrg-action-by" placeholder="contoh: Ahmad">
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:12px;">
+      <button id="btn-modal-brg-save" onclick="saveEditBRG()" style="flex:1;">💾 SIMPAN</button>
+      <button onclick="closeModalBRG()" class="outline" style="flex:1;">BATAL</button>
+    </div>
   </div>
+</div>
+<!-- FIX Bug #1: modal-brg DITUTUP DI SINI, bukan di dalam dirinya sendiri -->
 
 <!-- MODAL HAPUS -->
 <div id="modal-del" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;">
@@ -781,13 +784,13 @@ var role = 'cellman';
 var currentUser = null;
 var allData = [];
 var cmData = [];
-var brgData = [];       // cellman barang bermasalah
-var admBrgData = [];    // admin barang bermasalah
+var brgData = [];
+var admBrgData = [];
 var editId = null;
 var editCaller = 'adm';
 var editBrgId = null;
 var delId = null;
-var delCaller = 'adm';  // 'adm', 'cm', 'brg-cm', 'brg-adm'
+var delCaller = 'adm';
 
 // ── SIDEBAR ──
 function toggleSidebar(who) {
@@ -887,8 +890,8 @@ function cmShowPage(p) {
     var el = document.getElementById(subIds[key]);
     if (el) el.className = (key === p) ? 'active' : '';
   });
-  if (p === 'form-tac')   loadCMData();
-  if (p === 'form-brg')   loadBRGData();
+  if (p === 'form-tac') loadCMData();
+  if (p === 'form-brg') loadBRGData();
 }
 
 // ── ADMIN NAVIGATION ──
@@ -1000,12 +1003,19 @@ function renderCMTable(rows) {
     var actionBy = r.action_by
       ? '<div>' + r.action_by + '</div><div style="font-size:11px;color:#888;">' + (r.action_at ? r.action_at.slice(0,16).replace('T',' ') : '') + '</div>'
       : '<span style="color:#ccc;">—</span>';
+    // FIX Bug #5: urutan kolom uk_motif dan item_desc dibenarkan sesuai <th>
     html += '<tr>' +
-      '<td>' + (i+1) + '</td><td>' + (r.nama||'-') + '</td><td>' + (r.tanggal||'-') + '</td>' +
-      '<td>' + (r.from_sub_io||'-') + '</td><td>' + (r.to_sub_io||'-') + '</td>' +
-      '<td>' + (r.item_desc||'-') + '</td><td>' + (r.uk_motif||'-') + '</td>' +
-      '<td>' + (r.lot_no||'-') + '</td><td>' + (r.qty||'-') + '</td>' +
-      '<td>' + (r.note||'-') + '</td><td>' + badge(r.status) + '</td>' +
+      '<td>' + (i+1) + '</td>' +
+      '<td>' + (r.nama||'-') + '</td>' +
+      '<td>' + (r.tanggal||'-') + '</td>' +
+      '<td>' + (r.from_sub_io||'-') + '</td>' +
+      '<td>' + (r.to_sub_io||'-') + '</td>' +
+      '<td>' + (r.uk_motif||'-') + '</td>' +
+      '<td>' + (r.item_desc||'-') + '</td>' +
+      '<td>' + (r.lot_no||'-') + '</td>' +
+      '<td>' + (r.qty||'-') + '</td>' +
+      '<td>' + (r.note||'-') + '</td>' +
+      '<td>' + badge(r.status) + '</td>' +
       '<td>' + actionBy + '</td>' +
       '<td><div class="act-cell">' +
         '<button class="btn-icon edt" onclick="openEditModal(\'' + r.id + '\',\'cm\')">✏️</button>' +
@@ -1033,16 +1043,16 @@ async function submitBRG() {
   var btn = document.getElementById('btn-brg-submit');
   btn.disabled = true; btn.textContent = 'MENGIRIM...';
   var payload = {
-  nama        : nama.toUpperCase(),
-  tanggal     : tanggal,
-  from_sub_io : subio,
-  item_desc   : item.toUpperCase(),
-  uk_motif    : motif,
-  lot_no      : lot.toUpperCase(),
-  qty         : Number(qty),
-  note        : note.toUpperCase(),
-  created_by  : currentUser ? currentUser.email : ''   // ✅ tambahkan ini
-};
+    nama        : nama.toUpperCase(),
+    tanggal     : tanggal,
+    from_sub_io : subio,
+    item_desc   : item.toUpperCase(),
+    uk_motif    : motif,
+    lot_no      : lot.toUpperCase(),
+    qty         : Number(qty),
+    note        : note.toUpperCase(),
+    created_by  : currentUser ? currentUser.email : ''
+  };
   try {
     const { error } = await db.from('barang_bermasalah').insert(payload);
     if (error) throw error;
@@ -1083,6 +1093,8 @@ function filterBRGTable() {
   renderBRGTable(filtered, 'brg-tbody', 'cm');
 }
 
+// FIX Bug #5: urutan kolom di renderBRGTable disesuaikan dengan <th>
+// NO | NAMA | TANGGAL | SUBINVENTORY | UK MOTIF | ITEM DESC | LOT NO | QTY | REASON | STATUS | ACTION BY | AKSI
 function renderBRGTable(rows, tbodyId, caller) {
   var html = '';
   rows.forEach(function(r, i) {
@@ -1090,11 +1102,17 @@ function renderBRGTable(rows, tbodyId, caller) {
       ? '<div>' + r.action_by + '</div><div style="font-size:11px;color:#888;">' + (r.action_at ? r.action_at.slice(0,16).replace('T',' ') : '') + '</div>'
       : '<span style="color:#ccc;">—</span>';
     html += '<tr>' +
-      '<td>' + (i+1) + '</td><td>' + (r.nama||'-') + '</td><td>' + (r.tanggal||'-') + '</td>' +
-      '<td>' + (r.from_sub_io||'-') + '</td><td>' + (r.item_desc||'-') + '</td>' +
-      '<td>' + (r.uk_motif||'-') + '</td><td>' + (r.lot_no||'-') + '</td>' +
-      '<td>' + (r.qty||'-') + '</td><td>' + (r.note||'-') + '</td>' +
-      '<td>' + badge(r.status) + '</td><td>' + actionBy + '</td>' +
+      '<td>' + (i+1) + '</td>' +
+      '<td>' + (r.nama||'-') + '</td>' +
+      '<td>' + (r.tanggal||'-') + '</td>' +
+      '<td>' + (r.from_sub_io||'-') + '</td>' +
+      '<td>' + (r.uk_motif||'-') + '</td>' +
+      '<td>' + (r.item_desc||'-') + '</td>' +
+      '<td>' + (r.lot_no||'-') + '</td>' +
+      '<td>' + (r.qty||'-') + '</td>' +
+      '<td>' + (r.note||'-') + '</td>' +
+      '<td>' + badge(r.status) + '</td>' +
+      '<td>' + actionBy + '</td>' +
       '<td><div class="act-cell">' +
         '<button class="btn-icon edt" onclick="openEditModalBRG(\'' + r.id + '\',\'' + caller + '\')">✏️</button>' +
         '<button class="btn-icon del" onclick="hapusData(\'' + r.id + '\',\'brg-' + caller + '\')">🗑️</button>' +
@@ -1135,12 +1153,19 @@ function filterTable() {
     var actionBy = r.action_by
       ? '<div>' + r.action_by + '</div><div style="font-size:11px;color:#888;">' + (r.action_at ? r.action_at.slice(0,16).replace('T',' ') : '') + '</div>'
       : '<span style="color:#ccc;">—</span>';
+    // FIX Bug #5: urutan kolom uk_motif dan item_desc dibenarkan
     html += '<tr>' +
-      '<td>' + (i+1) + '</td><td>' + (r.nama||'-') + '</td><td>' + (r.tanggal||'-') + '</td>' +
-      '<td>' + (r.from_sub_io||'-') + '</td><td>' + (r.to_sub_io||'-') + '</td>' +
-      '<td>' + (r.item_desc||'-') + '</td><td>' + (r.uk_motif||'-') + '</td>' +
-      '<td>' + (r.lot_no||'-') + '</td><td>' + (r.qty||'-') + '</td>' +
-      '<td>' + (r.note||'-') + '</td><td>' + badge(r.status) + '</td>' +
+      '<td>' + (i+1) + '</td>' +
+      '<td>' + (r.nama||'-') + '</td>' +
+      '<td>' + (r.tanggal||'-') + '</td>' +
+      '<td>' + (r.from_sub_io||'-') + '</td>' +
+      '<td>' + (r.to_sub_io||'-') + '</td>' +
+      '<td>' + (r.uk_motif||'-') + '</td>' +
+      '<td>' + (r.item_desc||'-') + '</td>' +
+      '<td>' + (r.lot_no||'-') + '</td>' +
+      '<td>' + (r.qty||'-') + '</td>' +
+      '<td>' + (r.note||'-') + '</td>' +
+      '<td>' + badge(r.status) + '</td>' +
       '<td>' + actionBy + '</td>' +
       '<td><div class="act-cell">' +
         '<button class="btn-icon edt" onclick="openEditModal(\'' + r.id + '\',\'adm\')">✏️</button>' +
@@ -1187,17 +1212,18 @@ function openEditModal(id, caller) {
     : allData.find(r => r.id === id);
   if (!rec) return;
   editId = id; editCaller = caller;
-  document.getElementById('me-nama').value    = rec.nama        || '';
-  document.getElementById('me-tanggal').value = rec.tanggal     || '';
-  document.getElementById('me-from-io').value = rec.from_sub_io || '';
-  document.getElementById('me-to-io').value   = rec.to_sub_io   || '';
-  document.getElementById('me-item').value    = rec.item_desc   || '';
-  document.getElementById('me-uk-motif').value   = rec.uk_motif || '';
-  document.getElementById('me-lot').value     = rec.lot_no      || '';
-  document.getElementById('me-qty').value     = rec.qty         || '';
-  document.getElementById('me-note').value    = rec.note        || '';
-  document.getElementById('me-status').value  = rec.status      || 'DRAFT';
-  document.getElementById('me-action-by').value = rec.action_by || '';
+  document.getElementById('me-nama').value      = rec.nama        || '';
+  document.getElementById('me-tanggal').value   = rec.tanggal     || '';
+  document.getElementById('me-from-io').value   = rec.from_sub_io || '';
+  document.getElementById('me-to-io').value     = rec.to_sub_io   || '';
+  // FIX Bug #2: me-uk-motif (bukan me-motif)
+  document.getElementById('me-uk-motif').value  = rec.uk_motif    || '';
+  document.getElementById('me-item').value      = rec.item_desc   || '';
+  document.getElementById('me-lot').value       = rec.lot_no      || '';
+  document.getElementById('me-qty').value       = rec.qty         || '';
+  document.getElementById('me-note').value      = rec.note        || '';
+  document.getElementById('me-status').value    = rec.status      || 'DRAFT';
+  document.getElementById('me-action-by').value = rec.action_by   || '';
   document.getElementById('me-status-wrap').style.display   = caller === 'cm' ? 'none' : '';
   document.getElementById('me-actionby-wrap').style.display = caller === 'cm' ? 'none' : '';
   document.getElementById('modal').style.display = 'flex';
@@ -1217,8 +1243,9 @@ async function saveEdit() {
     tanggal     : document.getElementById('me-tanggal').value,
     from_sub_io : document.getElementById('me-from-io').value || '-',
     to_sub_io   : document.getElementById('me-to-io').value   || '-',
+    // FIX Bug #2: me-uk-motif
+    uk_motif    : document.getElementById('me-uk-motif').value || '-',
     item_desc   : (document.getElementById('me-item').value.trim() || '-').toUpperCase(),
-    uk_motif    : document.getElementById('me-uk-motif').value   || '-',
     lot_no      : (document.getElementById('me-lot').value.trim()  || '-').toUpperCase(),
     qty         : Number(document.getElementById('me-qty').value) || 0,
     note        : (document.getElementById('me-note').value.trim() || '-').toUpperCase()
@@ -1248,20 +1275,21 @@ function openEditModalBRG(id, caller) {
     : brgData.find(r => r.id === id);
   if (!rec) return;
   editBrgId = id; editCaller = caller;
-  document.getElementById('mbrg-nama').value    = rec.nama        || '';
-  document.getElementById('mbrg-tanggal').value = rec.tanggal     || '';
-  document.getElementById('mbrg-sub-io').value  = rec.from_sub_io || '';
-  document.getElementById('mbrg-item').value    = rec.item_desc   || '';
-  document.getElementById('mbrg-uk-motif').value   = rec.uk_motif || '';
-  document.getElementById('mbrg-lot').value     = rec.lot_no      || '';
-  document.getElementById('mbrg-qty').value     = rec.qty         || '';
-  document.getElementById('mbrg-note').value    = rec.note        || '';
-  document.getElementById('mbrg-status').value  = rec.status      || 'DRAFT';
-  document.getElementById('mbrg-action-by').value = rec.action_by || '';
-  // Cellman: sembunyikan status & action by
+  document.getElementById('mbrg-nama').value      = rec.nama        || '';
+  document.getElementById('mbrg-tanggal').value   = rec.tanggal     || '';
+  document.getElementById('mbrg-sub-io').value    = rec.from_sub_io || '';
+  // FIX Bug #3: mbrg-uk-motif
+  document.getElementById('mbrg-uk-motif').value  = rec.uk_motif    || '';
+  document.getElementById('mbrg-item').value      = rec.item_desc   || '';
+  document.getElementById('mbrg-lot').value       = rec.lot_no      || '';
+  document.getElementById('mbrg-qty').value       = rec.qty         || '';
+  document.getElementById('mbrg-note').value      = rec.note        || '';
+  document.getElementById('mbrg-status').value    = rec.status      || 'DRAFT';
+  // FIX Bug #3: mbrg-action-by
+  document.getElementById('mbrg-action-by').value = rec.action_by  || '';
   var isAdm = caller === 'adm';
-  document.getElementById('mbrg-status').parentElement.style.display    = isAdm ? '' : 'none';
-  document.getElementById('mbrg-action-by').parentElement.parentElement.style.display = isAdm ? '' : 'none';
+  document.getElementById('mbrg-status-wrap').style.display    = isAdm ? '' : 'none';
+  document.getElementById('mbrg-actionby-wrap').style.display  = isAdm ? '' : 'none';
   document.getElementById('modal-brg').style.display = 'flex';
 }
 
@@ -1278,14 +1306,16 @@ async function saveEditBRG() {
     nama        : (document.getElementById('mbrg-nama').value.trim() || '-').toUpperCase(),
     tanggal     : document.getElementById('mbrg-tanggal').value,
     from_sub_io : document.getElementById('mbrg-sub-io').value || '-',
-    item_desc   : (document.getElementById('mbrg-item').value.trim() || '-').toUpperCase(),
+    // FIX Bug #3: mbrg-uk-motif
     uk_motif    : document.getElementById('mbrg-uk-motif').value  || '-',
+    item_desc   : (document.getElementById('mbrg-item').value.trim() || '-').toUpperCase(),
     lot_no      : (document.getElementById('mbrg-lot').value.trim()  || '-').toUpperCase(),
     qty         : Number(document.getElementById('mbrg-qty').value) || 0,
     note        : (document.getElementById('mbrg-note').value.trim() || '-').toUpperCase()
   };
   if (editCaller === 'adm') {
     updates.status    = document.getElementById('mbrg-status').value;
+    // FIX Bug #3: mbrg-action-by
     var actionName    = document.getElementById('mbrg-action-by').value.trim();
     updates.action_by = actionName ? actionName.toUpperCase() : (currentUser ? currentUser.email : '');
     updates.action_at = new Date().toISOString();
@@ -1305,7 +1335,7 @@ async function saveEditBRG() {
 // ── HAPUS ──
 function hapusData(id, caller) {
   var rec;
-  if (caller === 'cm')      rec = cmData.find(r => r.id === id);
+  if (caller === 'cm')       rec = cmData.find(r => r.id === id);
   else if (caller === 'adm') rec = allData.find(r => r.id === id);
   else if (caller === 'brg-cm')  rec = brgData.find(r => r.id === id);
   else if (caller === 'brg-adm') rec = admBrgData.find(r => r.id === id);
@@ -1329,8 +1359,8 @@ async function konfirmasiHapus() {
     const { error } = await db.from(table).delete().eq('id', delId);
     if (error) throw error;
     closeDelModal();
-    if (delCaller === 'adm')     loadADMData();
-    else if (delCaller === 'cm') loadCMData();
+    if (delCaller === 'adm')          loadADMData();
+    else if (delCaller === 'cm')      loadCMData();
     else if (delCaller === 'brg-cm')  loadBRGData();
     else if (delCaller === 'brg-adm') loadADMBRGData();
   } catch(e) {
@@ -1347,28 +1377,47 @@ function badge(s) {
 }
 
 // ── EXCEL HELPERS ──
+// FIX Bug #4: buildExcelData — kolom UK MOTIF dipindah ke posisi yang benar (setelah FROM/TO)
 function buildExcelData(rows) {
-  var headers = ['NO','NAMA','TANGGAL','FROM SUB IO','TO SUB IO','UKURAN MOTIF','ITEM DESC','LOT NO','QTY','NOTE','STATUS ADMIN','ACTION BY','ACTION AT'];
+  var headers = ['NO','NAMA','TANGGAL','FROM SUB IO','TO SUB IO','UK MOTIF','ITEM DESC','LOT NO','QTY','NOTE','STATUS','ACTION BY','ACTION AT'];
   var data = [headers];
   rows.forEach(function(r, i) {
     data.push([
-      i+1, r.nama||'-', r.tanggal||'-', r.from_sub_io||'-', r.to_sub_io||'-',
-      r.item_desc||'-', r.uk_motif||'-', r.lot_no||'-', r.qty||'-', r.note||'-',
-      r.status||'-', r.action_by||'-',
+      i+1,
+      r.nama||'-',
+      r.tanggal||'-',
+      r.from_sub_io||'-',
+      r.to_sub_io||'-',
+      r.uk_motif||'-',
+      r.item_desc||'-',
+      r.lot_no||'-',
+      r.qty||'-',
+      r.note||'-',
+      r.status||'-',
+      r.action_by||'-',
       r.action_at ? r.action_at.slice(0,16).replace('T',' ') : '-'
     ]);
   });
   return data;
 }
 
+// FIX Bug #4: buildExcelDataBRG — header dilengkapi 12 kolom sesuai data yang di-push
 function buildExcelDataBRG(rows) {
-  var headers = ['NO','NAMA','TANGGAL','SUBINVENTORY','UKURAN MOTIF','ITEM DESC','LOT NO','QTY'];
+  var headers = ['NO','NAMA','TANGGAL','SUBINVENTORY','UK MOTIF','ITEM DESC','LOT NO','QTY','REASON','STATUS','ACTION BY','ACTION AT'];
   var data = [headers];
   rows.forEach(function(r, i) {
     data.push([
-      i+1, r.nama||'-', r.tanggal||'-', r.from_sub_io||'-',
-      r.item_desc||'-', r.uk_motif||'-', r.lot_no||'-', r.qty||'-', r.note||'-',
-      r.status||'-', r.action_by||'-',
+      i+1,
+      r.nama||'-',
+      r.tanggal||'-',
+      r.from_sub_io||'-',
+      r.uk_motif||'-',
+      r.item_desc||'-',
+      r.lot_no||'-',
+      r.qty||'-',
+      r.note||'-',
+      r.status||'-',
+      r.action_by||'-',
       r.action_at ? r.action_at.slice(0,16).replace('T',' ') : '-'
     ]);
   });
@@ -1383,8 +1432,8 @@ function exportExcel(data, filename, colWidths) {
   XLSX.writeFile(wb, filename);
 }
 
-var tacCols = [{wch:5},{wch:20},{wch:12},{wch:12},{wch:12},{wch:22},{wch:12},{wch:14},{wch:8},{wch:20},{wch:12},{wch:24},{wch:18}];
-var brgCols = [{wch:5},{wch:20},{wch:12},{wch:12},{wch:22},{wch:12},{wch:14},{wch:8},{wch:24},{wch:12},{wch:24},{wch:18}];
+var tacCols = [{wch:5},{wch:20},{wch:12},{wch:12},{wch:12},{wch:10},{wch:22},{wch:14},{wch:8},{wch:20},{wch:10},{wch:20},{wch:18}];
+var brgCols = [{wch:5},{wch:20},{wch:12},{wch:12},{wch:10},{wch:22},{wch:14},{wch:8},{wch:24},{wch:10},{wch:20},{wch:18}];
 
 async function downloadExcelCM() {
   var dari = document.getElementById('cm-rep-dari').value;
