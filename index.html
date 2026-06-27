@@ -820,18 +820,25 @@ function setRole(r) {
   role = r;
   document.getElementById('rb-cm').className  = r === 'cellman' ? '' : 'outline';
   document.getElementById('rb-adm').className = r === 'admin'   ? '' : 'outline';
+  // Auto-isi email sesuai role yang dipilih
+  var emailEl = document.getElementById('l-email');
+  if (r === 'cellman') {
+    emailEl.value = 'cellman@tac.com';
+  } else {
+    emailEl.value = 'admin@tac.com';
+  }
+  document.getElementById('l-pass').value = '';
+  document.getElementById('l-err').innerHTML = '';
+  document.getElementById('l-pass').focus();
 }
 
 // ── AUTH ──
-// Daftar email admin yang diizinkan (tambah sesuai kebutuhan)
+// Daftar email admin yang diizinkan
 var ADMIN_EMAILS = [
-  'admin@ptplatinum.com',
-  'admin@platinum.com',
-  'supervisor@ptplatinum.com'
+  'admin@tac.com'
 ];
 
 function isAdminEmail(email) {
-  // Cek apakah email ada di daftar admin
   return ADMIN_EMAILS.some(function(a) { return a.toLowerCase() === email.toLowerCase(); });
 }
 
@@ -1543,6 +1550,8 @@ window.addEventListener('load', function() {
   document.getElementById('adm-rep-sampai').value     = today;
   document.getElementById('adm-brg-rep-dari').value   = firstDay;
   document.getElementById('adm-brg-rep-sampai').value = today;
+  // Default email sesuai role awal (cellman)
+  document.getElementById('l-email').value = 'cellman@tac.com';
 });
 
 document.getElementById('modal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
