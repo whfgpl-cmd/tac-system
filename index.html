@@ -1,3 +1,6 @@
+
+
+Form tac system updated · HTML
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -1017,8 +1020,8 @@ function renderCMTable(rows) {
       '<td>' + badge(r.status) + '</td>' +
       '<td>' + actionBy + '</td>' +
       '<td><div class="act-cell">' +
-        '<button class="btn-icon edt" onclick="openEditModal(\'' + r.id + '\',\'cm\')">✏️</button>' +
-        '<button class="btn-icon del" onclick="hapusData(\'' + r.id + '\',\'cm\')">🗑️</button>' +
+        '<button class="btn-icon edt" data-id="' + r.id + '" data-caller="cm" onclick="openEditModal(this.dataset.id, this.dataset.caller)">✏️</button>' +
+        '<button class="btn-icon del" data-id="' + r.id + '" data-caller="cm" onclick="hapusData(this.dataset.id, this.dataset.caller)">🗑️</button>' +
       '</div></td></tr>';
   });
   document.getElementById('cm-tbody').innerHTML = html ||
@@ -1100,6 +1103,7 @@ function renderBRGTable(rows, tbodyId, caller) {
       ? '<td>' + (r.reason_admin || '<span style="color:#ccc;">—</span>') + '</td>' +
         '<td>' + badge(r.penyelesaian || r.status) + '</td>'
       : '';
+    var rid = String(r.id);
     html += '<tr>' +
       '<td>' + (i+1) + '</td>' +
       '<td>' + (r.nama||'-') + '</td>' +
@@ -1113,8 +1117,8 @@ function renderBRGTable(rows, tbodyId, caller) {
       '<td>' + badge(r.status) + '</td>' +
       adminCols +
       '<td><div class="act-cell">' +
-        '<button class="btn-icon edt" onclick="openEditModalBRG(\'' + r.id + '\',\'' + caller + '\')">✏️</button>' +
-        '<button class="btn-icon del" onclick="hapusData(\'' + r.id + '\',\'brg-' + caller + '\')">🗑️</button>' +
+        '<button class="btn-icon edt" data-id="' + rid + '" data-caller="' + caller + '" onclick="openEditModalBRG(this.dataset.id, this.dataset.caller)">✏️</button>' +
+        '<button class="btn-icon del" data-id="' + rid + '" data-caller="brg-' + caller + '" onclick="hapusData(this.dataset.id, this.dataset.caller)">🗑️</button>' +
       '</div></td></tr>';
   });
   var colspan = caller === 'adm' ? 13 : 12;
@@ -1168,8 +1172,8 @@ function filterTable() {
       '<td>' + badge(r.status) + '</td>' +
       '<td>' + actionBy + '</td>' +
       '<td><div class="act-cell">' +
-        '<button class="btn-icon edt" onclick="openEditModal(\'' + r.id + '\',\'adm\')">✏️</button>' +
-        '<button class="btn-icon del" onclick="hapusData(\'' + r.id + '\',\'adm\')">🗑️</button>' +
+        '<button class="btn-icon edt" data-id="' + r.id + '" data-caller="adm" onclick="openEditModal(this.dataset.id, this.dataset.caller)">✏️</button>' +
+        '<button class="btn-icon del" data-id="' + r.id + '" data-caller="adm" onclick="hapusData(this.dataset.id, this.dataset.caller)">🗑️</button>' +
       '</div></td></tr>';
   });
   document.getElementById('adm-tbody').innerHTML = html ||
@@ -1271,9 +1275,12 @@ async function saveEdit() {
 // ── MODAL EDIT BARANG BERMASALAH ──
 function openEditModalBRG(id, caller) {
   var rec = caller === 'adm'
-    ? admBrgData.find(r => r.id === id)
-    : brgData.find(r => r.id === id);
-  if (!rec) return;
+    ? admBrgData.find(r => String(r.id) === String(id))
+    : brgData.find(r => String(r.id) === String(id));
+  if (!rec) {
+    alert('Data tidak ditemukan. Coba klik ↺ REFRESH terlebih dahulu.');
+    return;
+  }
   editBrgId = id; editCaller = caller;
   document.getElementById('mbrg-nama').value         = rec.nama        || '';
   document.getElementById('mbrg-tanggal').value      = rec.tanggal     || '';
@@ -1531,3 +1538,7 @@ document.addEventListener('keydown', function(e) {
 </script>
 </body>
 </html>
+ 
+
+
+
