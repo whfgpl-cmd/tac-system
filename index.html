@@ -521,7 +521,7 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
               <tr>
                 <th>NO</th><th>NAMA</th><th>TANGGAL</th><th>SUBINVENTORY</th><th>UK MOTIF</th>
                 <th>ITEM DESC</th><th>LOT NO</th><th>QTY</th>
-                <th>REASON</th><th>STATUS</th><th>ACTION BY</th><th>AKSI</th>
+                <th>REASON</th><th>STATUS</th><th>REASON ADMIN</th><th>PENYELESAIAN</th><th>EDIT</th>
               </tr>
             </thead>
             <tbody id="adm-brg-tbody">
@@ -737,20 +737,19 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
         <label class="flabel">REASON</label>
         <input type="text" id="mbrg-note">
       </div>
-      <div class="fgroup" style="flex:1;min-width:130px;" id="mbrg-status-wrap">
-        <label class="flabel">STATUS</label>
-        <select id="mbrg-status">
-          <option value="DRAFT">DRAFT</option>
+    </div>
+    <!-- Field khusus Admin: Reason Admin + Penyelesaian -->
+    <div style="display:flex;gap:10px;flex-wrap:wrap;" id="mbrg-admin-wrap">
+      <div class="fgroup" style="flex:2;min-width:200px;">
+        <label class="flabel">REASON ADMIN <span style="font-weight:normal;color:#888;font-size:11px;">(tindakan/keterangan admin)</span></label>
+        <input type="text" id="mbrg-reason-admin" placeholder="contoh: Sudah dikembalikan ke supplier">
+      </div>
+      <div class="fgroup" style="flex:1;min-width:130px;">
+        <label class="flabel">PENYELESAIAN</label>
+        <select id="mbrg-penyelesaian">
           <option value="WAIT">WAIT</option>
           <option value="DONE">DONE</option>
         </select>
-      </div>
-    </div>
-    <!-- FIX Bug #3: id="mbrg-action-by" ditambahkan (sebelumnya tidak ada di HTML) -->
-    <div style="display:flex;gap:10px;flex-wrap:wrap;" id="mbrg-actionby-wrap">
-      <div class="fgroup" style="flex:1;min-width:200px;">
-        <label class="flabel">ACTION BY <span style="font-weight:normal;color:#888;font-size:11px;">(nama admin — isi manual)</span></label>
-        <input type="text" id="mbrg-action-by" placeholder="contoh: Ahmad">
       </div>
     </div>
     <div style="display:flex;gap:8px;margin-top:12px;">
@@ -1093,14 +1092,14 @@ function filterBRGTable() {
   renderBRGTable(filtered, 'brg-tbody', 'cm');
 }
 
-// FIX Bug #5: urutan kolom di renderBRGTable disesuaikan dengan <th>
-// NO | NAMA | TANGGAL | SUBINVENTORY | UK MOTIF | ITEM DESC | LOT NO | QTY | REASON | STATUS | ACTION BY | AKSI
+// NO | NAMA | TANGGAL | SUBINVENTORY | UK MOTIF | ITEM DESC | LOT NO | QTY | REASON | STATUS | [REASON ADMIN | PENYELESAIAN - admin only] | EDIT
 function renderBRGTable(rows, tbodyId, caller) {
   var html = '';
   rows.forEach(function(r, i) {
-    var actionBy = r.action_by
-      ? '<div>' + r.action_by + '</div><div style="font-size:11px;color:#888;">' + (r.action_at ? r.action_at.slice(0,16).replace('T',' ') : '') + '</div>'
-      : '<span style="color:#ccc;">—</span>';
+    var adminCols = (caller === 'adm')
+      ? '<td>' + (r.reason_admin || '<span style="color:#ccc;">—</span>') + '</td>' +
+        '<td>' + badge(r.penyelesaian || r.status) + '</td>'
+      : '';
     html += '<tr>' +
       '<td>' + (i+1) + '</td>' +
       '<td>' + (r.nama||'-') + '</td>' +
@@ -1112,14 +1111,15 @@ function renderBRGTable(rows, tbodyId, caller) {
       '<td>' + (r.qty||'-') + '</td>' +
       '<td>' + (r.note||'-') + '</td>' +
       '<td>' + badge(r.status) + '</td>' +
-      '<td>' + actionBy + '</td>' +
+      adminCols +
       '<td><div class="act-cell">' +
         '<button class="btn-icon edt" onclick="openEditModalBRG(\'' + r.id + '\',\'' + caller + '\')">✏️</button>' +
         '<button class="btn-icon del" onclick="hapusData(\'' + r.id + '\',\'brg-' + caller + '\')">🗑️</button>' +
       '</div></td></tr>';
   });
+  var colspan = caller === 'adm' ? 13 : 12;
   document.getElementById(tbodyId).innerHTML = html ||
-    '<tr><td colspan="12" style="text-align:center;padding:20px;color:#888;">— tidak ada data —</td></tr>';
+    '<tr><td colspan="' + colspan + '" style="text-align:center;padding:20px;color:#888;">— tidak ada data —</td></tr>';
 }
 
 // ── DATA TAC (ADMIN) ──
@@ -1275,21 +1275,18 @@ function openEditModalBRG(id, caller) {
     : brgData.find(r => r.id === id);
   if (!rec) return;
   editBrgId = id; editCaller = caller;
-  document.getElementById('mbrg-nama').value      = rec.nama        || '';
-  document.getElementById('mbrg-tanggal').value   = rec.tanggal     || '';
-  document.getElementById('mbrg-sub-io').value    = rec.from_sub_io || '';
-  // FIX Bug #3: mbrg-uk-motif
-  document.getElementById('mbrg-uk-motif').value  = rec.uk_motif    || '';
-  document.getElementById('mbrg-item').value      = rec.item_desc   || '';
-  document.getElementById('mbrg-lot').value       = rec.lot_no      || '';
-  document.getElementById('mbrg-qty').value       = rec.qty         || '';
-  document.getElementById('mbrg-note').value      = rec.note        || '';
-  document.getElementById('mbrg-status').value    = rec.status      || 'DRAFT';
-  // FIX Bug #3: mbrg-action-by
-  document.getElementById('mbrg-action-by').value = rec.action_by  || '';
+  document.getElementById('mbrg-nama').value         = rec.nama        || '';
+  document.getElementById('mbrg-tanggal').value      = rec.tanggal     || '';
+  document.getElementById('mbrg-sub-io').value       = rec.from_sub_io || '';
+  document.getElementById('mbrg-uk-motif').value     = rec.uk_motif    || '';
+  document.getElementById('mbrg-item').value         = rec.item_desc   || '';
+  document.getElementById('mbrg-lot').value          = rec.lot_no      || '';
+  document.getElementById('mbrg-qty').value          = rec.qty         || '';
+  document.getElementById('mbrg-note').value         = rec.note        || '';
+  document.getElementById('mbrg-reason-admin').value = rec.reason_admin || '';
+  document.getElementById('mbrg-penyelesaian').value = rec.penyelesaian || 'WAIT';
   var isAdm = caller === 'adm';
-  document.getElementById('mbrg-status-wrap').style.display    = isAdm ? '' : 'none';
-  document.getElementById('mbrg-actionby-wrap').style.display  = isAdm ? '' : 'none';
+  document.getElementById('mbrg-admin-wrap').style.display = isAdm ? '' : 'none';
   document.getElementById('modal-brg').style.display = 'flex';
 }
 
@@ -1306,7 +1303,6 @@ async function saveEditBRG() {
     nama        : (document.getElementById('mbrg-nama').value.trim() || '-').toUpperCase(),
     tanggal     : document.getElementById('mbrg-tanggal').value,
     from_sub_io : document.getElementById('mbrg-sub-io').value || '-',
-    // FIX Bug #3: mbrg-uk-motif
     uk_motif    : document.getElementById('mbrg-uk-motif').value  || '-',
     item_desc   : (document.getElementById('mbrg-item').value.trim() || '-').toUpperCase(),
     lot_no      : (document.getElementById('mbrg-lot').value.trim()  || '-').toUpperCase(),
@@ -1314,11 +1310,11 @@ async function saveEditBRG() {
     note        : (document.getElementById('mbrg-note').value.trim() || '-').toUpperCase()
   };
   if (editCaller === 'adm') {
-    updates.status    = document.getElementById('mbrg-status').value;
-    // FIX Bug #3: mbrg-action-by
-    var actionName    = document.getElementById('mbrg-action-by').value.trim();
-    updates.action_by = actionName ? actionName.toUpperCase() : (currentUser ? currentUser.email : '');
-    updates.action_at = new Date().toISOString();
+    var reasonAdmin = document.getElementById('mbrg-reason-admin').value.trim();
+    updates.reason_admin  = reasonAdmin ? reasonAdmin.toUpperCase() : '-';
+    updates.penyelesaian  = document.getElementById('mbrg-penyelesaian').value;
+    updates.status        = document.getElementById('mbrg-penyelesaian').value;
+    updates.action_at     = new Date().toISOString();
   }
   try {
     const { error } = await db.from('barang_bermasalah').update(updates).eq('id', editBrgId);
@@ -1401,9 +1397,8 @@ function buildExcelData(rows) {
   return data;
 }
 
-// FIX Bug #4: buildExcelDataBRG — header dilengkapi 12 kolom sesuai data yang di-push
 function buildExcelDataBRG(rows) {
-  var headers = ['NO','NAMA','TANGGAL','SUBINVENTORY','UK MOTIF','ITEM DESC','LOT NO','QTY','REASON','STATUS','ACTION BY','ACTION AT'];
+  var headers = ['NO','NAMA','TANGGAL','SUBINVENTORY','UK MOTIF','ITEM DESC','LOT NO','QTY','REASON','STATUS','REASON ADMIN','PENYELESAIAN','ACTION AT'];
   var data = [headers];
   rows.forEach(function(r, i) {
     data.push([
@@ -1417,7 +1412,8 @@ function buildExcelDataBRG(rows) {
       r.qty||'-',
       r.note||'-',
       r.status||'-',
-      r.action_by||'-',
+      r.reason_admin||'-',
+      r.penyelesaian||'-',
       r.action_at ? r.action_at.slice(0,16).replace('T',' ') : '-'
     ]);
   });
@@ -1433,7 +1429,7 @@ function exportExcel(data, filename, colWidths) {
 }
 
 var tacCols = [{wch:5},{wch:20},{wch:12},{wch:12},{wch:12},{wch:10},{wch:22},{wch:14},{wch:8},{wch:20},{wch:10},{wch:20},{wch:18}];
-var brgCols = [{wch:5},{wch:20},{wch:12},{wch:12},{wch:10},{wch:22},{wch:14},{wch:8},{wch:24},{wch:10},{wch:20},{wch:18}];
+var brgCols = [{wch:5},{wch:20},{wch:12},{wch:12},{wch:10},{wch:22},{wch:14},{wch:8},{wch:24},{wch:10},{wch:24},{wch:14},{wch:18}];
 
 async function downloadExcelCM() {
   var dari = document.getElementById('cm-rep-dari').value;
