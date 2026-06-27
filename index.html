@@ -282,7 +282,7 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
               <tr>
                 <th>NO</th><th>NAMA</th><th>TANGGAL</th><th>FROM SUB IO</th>
                 <th>TO SUB IO</th><th>UK MOTIF</th><th>ITEM DESC</th><th>LOT NO</th>
-                <th>QTY</th><th>NOTE</th><th>STATUS</th><th>ACTION BY</th><th>EDIT</th>
+                <th>QTY</th><th>NOTE</th><th>STATUS</th><th>EDIT</th>
               </tr>
             </thead>
             <tbody id="cm-tbody">
@@ -488,7 +488,7 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
               <tr>
                 <th>NO</th><th>NAMA</th><th>TANGGAL</th><th>FROM SUB IO</th>
                 <th>TO SUB IO</th><th>UK MOTIF</th><th>ITEM DESC</th><th>LOT NO</th>
-                <th>QTY</th><th>NOTE</th><th>STATUS</th><th>ACTION BY</th><th>EDIT</th>
+                <th>QTY</th><th>NOTE</th><th>STATUS</th><th>EDIT</th>
               </tr>
             </thead>
             <tbody id="adm-tbody">
@@ -663,24 +663,12 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
         </select>
       </div>
     </div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;" id="me-actionby-wrap">
-      <div class="fgroup" style="flex:1;min-width:200px;">
-        <label class="flabel">ACTION BY <span style="font-weight:normal;color:#888;font-size:11px;">(nama admin — isi manual)</span></label>
-        <input type="text" id="me-action-by" placeholder="contoh: Ahmad">
-      </div>
-    </div>
     <div style="display:flex;gap:8px;margin-top:12px;">
       <button id="btn-modal-save" onclick="saveEdit()" style="flex:1;">💾 SIMPAN</button>
       <button onclick="closeModal()" class="outline" style="flex:1;">BATAL</button>
     </div>
   </div>
 </div>
-
-<!-- ═══════════════════════════════════════════════════════
-     MODAL EDIT BARANG BERMASALAH (ADMIN)
-     FIX Bug #1: div penutup modal-brg diperbaiki (sebelumnya modal-del ada di DALAM modal-brg)
-     FIX Bug #3: tambah id="mbrg-uk-motif" dan id="mbrg-action-by" yang hilang
-     ═══════════════════════════════════════════════════════ -->
 <div id="modal-brg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:center;justify-content:center;overflow-y:auto;">
   <div style="background:#fff;border:2px solid #000;padding:24px;width:100%;max-width:560px;margin:16px;">
     <h2 style="margin-bottom:14px;">✏️ EDIT BARANG BERMASALAH</h2>
@@ -981,7 +969,6 @@ async function submitTAC() {
     note        : note.toUpperCase(),
     status      : 'DRAFT',
     created_by  : currentUser ? currentUser.email : '',
-    action_by   : null,
     action_at   : null
   };
   try {
@@ -1029,10 +1016,6 @@ function filterCMTable() {
 function renderCMTable(rows) {
   var html = '';
   rows.forEach(function(r, i) {
-    var actionBy = r.action_by
-      ? '<div>' + r.action_by + '</div><div style="font-size:11px;color:#888;">' + (r.action_at ? r.action_at.slice(0,16).replace('T',' ') : '') + '</div>'
-      : '<span style="color:#ccc;">—</span>';
-    // FIX Bug #5: urutan kolom uk_motif dan item_desc dibenarkan sesuai <th>
     html += '<tr>' +
       '<td>' + (i+1) + '</td>' +
       '<td>' + (r.nama||'-') + '</td>' +
@@ -1045,7 +1028,6 @@ function renderCMTable(rows) {
       '<td>' + (r.qty||'-') + '</td>' +
       '<td>' + (r.note||'-') + '</td>' +
       '<td>' + badge(r.status) + '</td>' +
-      '<td>' + actionBy + '</td>' +
       '<td><div class="act-cell">' +
         '<button class="btn-icon edt" data-id="' + r.id + '" data-caller="cm" onclick="openEditModal(this.dataset.id, this.dataset.caller)">✏️</button>' +
         '<button class="btn-icon del" data-id="' + r.id + '" data-caller="cm" onclick="hapusData(this.dataset.id, this.dataset.caller)">🗑️</button>' +
@@ -1182,10 +1164,6 @@ function filterTable() {
   });
   var html = '';
   filtered.forEach(function(r, i) {
-    var actionBy = r.action_by
-      ? '<div>' + r.action_by + '</div><div style="font-size:11px;color:#888;">' + (r.action_at ? r.action_at.slice(0,16).replace('T',' ') : '') + '</div>'
-      : '<span style="color:#ccc;">—</span>';
-    // FIX Bug #5: urutan kolom uk_motif dan item_desc dibenarkan
     html += '<tr>' +
       '<td>' + (i+1) + '</td>' +
       '<td>' + (r.nama||'-') + '</td>' +
@@ -1198,7 +1176,6 @@ function filterTable() {
       '<td>' + (r.qty||'-') + '</td>' +
       '<td>' + (r.note||'-') + '</td>' +
       '<td>' + badge(r.status) + '</td>' +
-      '<td>' + actionBy + '</td>' +
       '<td><div class="act-cell">' +
         '<button class="btn-icon edt" data-id="' + r.id + '" data-caller="adm" onclick="openEditModal(this.dataset.id, this.dataset.caller)">✏️</button>' +
         '<button class="btn-icon del" data-id="' + r.id + '" data-caller="adm" onclick="hapusData(this.dataset.id, this.dataset.caller)">🗑️</button>' +
@@ -1255,9 +1232,7 @@ function openEditModal(id, caller) {
   document.getElementById('me-qty').value       = rec.qty         || '';
   document.getElementById('me-note').value      = rec.note        || '';
   document.getElementById('me-status').value    = rec.status      || 'DRAFT';
-  document.getElementById('me-action-by').value = rec.action_by   || '';
   document.getElementById('me-status-wrap').style.display   = caller === 'cm' ? 'none' : '';
-  document.getElementById('me-actionby-wrap').style.display = caller === 'cm' ? 'none' : '';
   document.getElementById('modal').style.display = 'flex';
 }
 
@@ -1284,8 +1259,6 @@ async function saveEdit() {
   };
   if (editCaller === 'adm') {
     updates.status    = document.getElementById('me-status').value;
-    var actionName    = document.getElementById('me-action-by').value.trim();
-    updates.action_by = actionName ? actionName.toUpperCase() : (currentUser ? currentUser.email : '');
     updates.action_at = new Date().toISOString();
   }
   try {
@@ -1410,7 +1383,7 @@ function badge(s) {
 // ── EXCEL HELPERS ──
 // FIX Bug #4: buildExcelData — kolom UK MOTIF dipindah ke posisi yang benar (setelah FROM/TO)
 function buildExcelData(rows) {
-  var headers = ['NO','NAMA','TANGGAL','FROM SUB IO','TO SUB IO','UK MOTIF','ITEM DESC','LOT NO','QTY','NOTE','STATUS','ACTION BY','ACTION AT'];
+  var headers = ['NO','NAMA','TANGGAL','FROM SUB IO','TO SUB IO','UK MOTIF','ITEM DESC','LOT NO','QTY','NOTE','STATUS','ACTION AT'];
   var data = [headers];
   rows.forEach(function(r, i) {
     data.push([
@@ -1425,7 +1398,6 @@ function buildExcelData(rows) {
       r.qty||'-',
       r.note||'-',
       r.status||'-',
-      r.action_by||'-',
       r.action_at ? r.action_at.slice(0,16).replace('T',' ') : '-'
     ]);
   });
