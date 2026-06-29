@@ -157,7 +157,7 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
       <ul class="sidebar-menu">
         <li>
           <a id="cm-menu-form-parent" class="menu-parent expanded" onclick="toggleSubmenu('cm-form')">
-            <span><span class="menu-icon">📝</span>FORM</span>
+            <span><span class="menu-icon"></span>FORM</span>
             <span class="chevron">▶</span>
           </a>
           <ul class="submenu open" id="cm-submenu-form">
@@ -167,7 +167,7 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
         </li>
         <li>
           <a id="cm-menu-report-parent" class="menu-parent" onclick="toggleSubmenu('cm-report')">
-            <span><span class="menu-icon">📊</span>REPORT</span>
+            <span><span class="menu-icon"></span>REPORT</span>
             <span class="chevron">▶</span>
           </a>
           <ul class="submenu" id="cm-submenu-report">
@@ -808,7 +808,7 @@ function setRole(r) {
   if (r === 'cellman') {
     emailEl.value = 'cellman@tac.com';
   } else {
-    emailEl.value = 'admin@tac.com';
+    emailEl.value = '';
   }
   document.getElementById('l-pass').value = '';
   document.getElementById('l-err').innerHTML = '';
