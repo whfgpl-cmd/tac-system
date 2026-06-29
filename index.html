@@ -157,7 +157,7 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
       <ul class="sidebar-menu">
         <li>
           <a id="cm-menu-form-parent" class="menu-parent expanded" onclick="toggleSubmenu('cm-form')">
-            <span><span class="menu-icon"></span>FORM</span>
+            <span><span class="menu-icon">📝</span>FORM</span>
             <span class="chevron">▶</span>
           </a>
           <ul class="submenu open" id="cm-submenu-form">
@@ -167,7 +167,7 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
         </li>
         <li>
           <a id="cm-menu-report-parent" class="menu-parent" onclick="toggleSubmenu('cm-report')">
-            <span><span class="menu-icon"></span>REPORT</span>
+            <span><span class="menu-icon">📊</span>REPORT</span>
             <span class="chevron">▶</span>
           </a>
           <ul class="submenu" id="cm-submenu-report">
@@ -286,7 +286,7 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
               </tr>
             </thead>
             <tbody id="cm-tbody">
-              <tr><td colspan="13" style="text-align:center;padding:20px;color:#888;">— belum ada data —</td></tr>
+              <tr><td colspan="12" style="text-align:center;padding:20px;color:#888;">— belum ada data —</td></tr>
             </tbody>
           </table>
         </div>
@@ -380,11 +380,11 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
               <tr>
                 <th>NO</th><th>NAMA</th><th>TANGGAL</th><th>SUBINVENTORY</th><th>UK MOTIF</th>
                 <th>ITEM DESC</th><th>LOT NO</th><th>QTY</th>
-                <th>REASON</th><th>STATUS</th><th>REASON ADMIN</th><th>PENYELESAIAN</th><th>EDIT</th>
+                <th>REASON</th><th>STATUS</th><th>ACTION BY</th><th>EDIT</th>
               </tr>
             </thead>
             <tbody id="brg-tbody">
-              <tr><td colspan="13" style="text-align:center;padding:20px;color:#888;">— belum ada data —</td></tr>
+              <tr><td colspan="12" style="text-align:center;padding:20px;color:#888;">— belum ada data —</td></tr>
             </tbody>
           </table>
         </div>
@@ -452,6 +452,8 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
           </ul>
         </li>
       
+        <!-- REPORT -->
+        <li>
           <a id="adm-menu-report-parent" class="menu-parent" onclick="toggleSubmenu('adm-report')">
             <span><span class="menu-icon">📊</span>REPORT</span>
             <span class="chevron">▶</span>
@@ -492,7 +494,7 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
               </tr>
             </thead>
             <tbody id="adm-tbody">
-              <tr><td colspan="13" style="text-align:center;padding:20px;color:#888;">— memuat data —</td></tr>
+              <tr><td colspan="12" style="text-align:center;padding:20px;color:#888;">— memuat data —</td></tr>
             </tbody>
           </table>
         </div>
@@ -521,11 +523,11 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
               <tr>
                 <th>NO</th><th>NAMA</th><th>TANGGAL</th><th>SUBINVENTORY</th><th>UK MOTIF</th>
                 <th>ITEM DESC</th><th>LOT NO</th><th>QTY</th>
-                <th>REASON</th><th>STATUS</th><th>REASON ADMIN</th><th>PENYELESAIAN</th><th>EDIT</th>
+                <th>REASON</th><th>STATUS</th><th>ACTION BY</th><th>EDIT</th>
               </tr>
             </thead>
             <tbody id="adm-brg-tbody">
-              <tr><td colspan="13" style="text-align:center;padding:20px;color:#888;">— memuat data —</td></tr>
+              <tr><td colspan="12" style="text-align:center;padding:20px;color:#888;">— memuat data —</td></tr>
             </tbody>
           </table>
         </div>
@@ -581,6 +583,10 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════
+     MODAL EDIT TAC
+     FIX Bug #2: id field motif diubah dari me-motif → me-uk-motif
+     ═══════════════════════════════════════════════════════ -->
 <div id="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:center;justify-content:center;overflow-y:auto;">
   <div style="background:#fff;border:2px solid #000;padding:24px;width:100%;max-width:560px;margin:16px;">
     <h2 style="margin-bottom:14px;">✏️ EDIT DATA TAC</h2>
@@ -622,7 +628,7 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
         </select>
       </div>
     </div>
-  
+    <!-- FIX Bug #2: id="me-uk-motif" (sebelumnya me-motif) -->
     <div class="fgroup">
       <label class="flabel">UKURAN MOTIF</label>
       <select id="me-uk-motif">
@@ -659,12 +665,24 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
         </select>
       </div>
     </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;" id="me-actionby-wrap">
+      <div class="fgroup" style="flex:1;min-width:200px;">
+        <label class="flabel">ACTION BY <span style="font-weight:normal;color:#888;font-size:11px;">(nama admin — isi manual)</span></label>
+        <input type="text" id="me-action-by" placeholder="contoh: Ahmad">
+      </div>
+    </div>
     <div style="display:flex;gap:8px;margin-top:12px;">
       <button id="btn-modal-save" onclick="saveEdit()" style="flex:1;">💾 SIMPAN</button>
       <button onclick="closeModal()" class="outline" style="flex:1;">BATAL</button>
     </div>
   </div>
 </div>
+
+<!-- ═══════════════════════════════════════════════════════
+     MODAL EDIT BARANG BERMASALAH (ADMIN)
+     FIX Bug #1: div penutup modal-brg diperbaiki (sebelumnya modal-del ada di DALAM modal-brg)
+     FIX Bug #3: tambah id="mbrg-uk-motif" dan id="mbrg-action-by" yang hilang
+     ═══════════════════════════════════════════════════════ -->
 <div id="modal-brg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:center;justify-content:center;overflow-y:auto;">
   <div style="background:#fff;border:2px solid #000;padding:24px;width:100%;max-width:560px;margin:16px;">
     <h2 style="margin-bottom:14px;">✏️ EDIT BARANG BERMASALAH</h2>
@@ -692,7 +710,7 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
           <option>FG20</option><option>DISPUT</option>
         </select>
       </div>
-     
+      <!-- FIX Bug #3: id="mbrg-uk-motif" ditambahkan (sebelumnya tidak ada) -->
       <div class="fgroup" style="flex:1;min-width:110px;">
         <label class="flabel">UKURAN MOTIF</label>
         <select id="mbrg-uk-motif">
@@ -721,19 +739,20 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
         <label class="flabel">REASON</label>
         <input type="text" id="mbrg-note">
       </div>
-    </div>
-    <!-- Field khusus Admin: Reason Admin + Penyelesaian -->
-    <div style="display:flex;gap:10px;flex-wrap:wrap;" id="mbrg-admin-wrap">
-      <div class="fgroup" style="flex:2;min-width:200px;">
-        <label class="flabel">REASON ADMIN <span style="font-weight:normal;color:#888;font-size:11px;">(tindakan/keterangan admin)</span></label>
-        <input type="text" id="mbrg-reason-admin" placeholder="contoh: Sudah dikembalikan ke supplier">
-      </div>
-      <div class="fgroup" style="flex:1;min-width:130px;">
-        <label class="flabel">PENYELESAIAN</label>
-        <select id="mbrg-penyelesaian">
+      <div class="fgroup" style="flex:1;min-width:130px;" id="mbrg-status-wrap">
+        <label class="flabel">STATUS</label>
+        <select id="mbrg-status">
+          <option value="DRAFT">DRAFT</option>
           <option value="WAIT">WAIT</option>
           <option value="DONE">DONE</option>
         </select>
+      </div>
+    </div>
+    <!-- FIX Bug #3: id="mbrg-action-by" ditambahkan (sebelumnya tidak ada di HTML) -->
+    <div style="display:flex;gap:10px;flex-wrap:wrap;" id="mbrg-actionby-wrap">
+      <div class="fgroup" style="flex:1;min-width:200px;">
+        <label class="flabel">ACTION BY <span style="font-weight:normal;color:#888;font-size:11px;">(nama admin — isi manual)</span></label>
+        <input type="text" id="mbrg-action-by" placeholder="contoh: Ahmad">
       </div>
     </div>
     <div style="display:flex;gap:8px;margin-top:12px;">
@@ -742,6 +761,7 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
     </div>
   </div>
 </div>
+<!-- FIX Bug #1: modal-brg DITUTUP DI SINI, bukan di dalam dirinya sendiri -->
 
 <!-- MODAL HAPUS -->
 <div id="modal-del" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;">
@@ -803,45 +823,15 @@ function setRole(r) {
   role = r;
   document.getElementById('rb-cm').className  = r === 'cellman' ? '' : 'outline';
   document.getElementById('rb-adm').className = r === 'admin'   ? '' : 'outline';
-  // Auto-isi email sesuai role yang dipilih
-  var emailEl = document.getElementById('l-email');
-  if (r === 'cellman') {
-    emailEl.value = 'cellman@tac.com';
-  } else {
-    emailEl.value = '';
-  }
-  document.getElementById('l-pass').value = '';
-  document.getElementById('l-err').innerHTML = '';
-  document.getElementById('l-pass').focus();
 }
 
 // ── AUTH ──
-// Daftar email admin yang diizinkan
-var ADMIN_EMAILS = [
-  'admin@tac.com'
-];
-
-function isAdminEmail(email) {
-  return ADMIN_EMAILS.some(function(a) { return a.toLowerCase() === email.toLowerCase(); });
-}
-
 async function doLogin() {
   var email = document.getElementById('l-email').value.trim();
   var pass  = document.getElementById('l-pass').value;
   var btn   = document.getElementById('btn-login');
   var err   = document.getElementById('l-err');
   err.innerHTML = '';
-
-  // Validasi: admin hanya bisa login di role ADMIN, cellman tidak bisa pakai email admin
-  if (role === 'admin' && !isAdminEmail(email)) {
-    err.innerHTML = '<div class="msg err">Email ini tidak terdaftar sebagai Admin.</div>';
-    return;
-  }
-  if (role === 'cellman' && isAdminEmail(email)) {
-    err.innerHTML = '<div class="msg err">Akun Admin tidak bisa login sebagai Cellman.</div>';
-    return;
-  }
-
   btn.disabled = true; btn.textContent = 'MEMPROSES...';
   try {
     const { data, error } = await db.auth.signInWithPassword({ email, password: pass });
@@ -964,6 +954,7 @@ async function submitTAC() {
     note        : note.toUpperCase(),
     status      : 'DRAFT',
     created_by  : currentUser ? currentUser.email : '',
+    action_by   : null,
     action_at   : null
   };
   try {
@@ -1011,6 +1002,10 @@ function filterCMTable() {
 function renderCMTable(rows) {
   var html = '';
   rows.forEach(function(r, i) {
+    var actionBy = r.action_by
+      ? '<div>' + r.action_by + '</div><div style="font-size:11px;color:#888;">' + (r.action_at ? r.action_at.slice(0,16).replace('T',' ') : '') + '</div>'
+      : '<span style="color:#ccc;">—</span>';
+    // FIX Bug #5: urutan kolom uk_motif dan item_desc dibenarkan sesuai <th>
     html += '<tr>' +
       '<td>' + (i+1) + '</td>' +
       '<td>' + (r.nama||'-') + '</td>' +
@@ -1023,13 +1018,14 @@ function renderCMTable(rows) {
       '<td>' + (r.qty||'-') + '</td>' +
       '<td>' + (r.note||'-') + '</td>' +
       '<td>' + badge(r.status) + '</td>' +
+      '<td>' + actionBy + '</td>' +
       '<td><div class="act-cell">' +
-        '<button class="btn-icon edt" data-id="' + r.id + '" data-caller="cm" onclick="openEditModal(this.dataset.id, this.dataset.caller)">✏️</button>' +
-        '<button class="btn-icon del" data-id="' + r.id + '" data-caller="cm" onclick="hapusData(this.dataset.id, this.dataset.caller)">🗑️</button>' +
+        '<button class="btn-icon edt" onclick="openEditModal(\'' + r.id + '\',\'cm\')">✏️</button>' +
+        '<button class="btn-icon del" onclick="hapusData(\'' + r.id + '\',\'cm\')">🗑️</button>' +
       '</div></td></tr>';
   });
   document.getElementById('cm-tbody').innerHTML = html ||
-    '<tr><td colspan="13" style="text-align:center;padding:20px;color:#888;">— tidak ada data —</td></tr>';
+    '<tr><td colspan="12" style="text-align:center;padding:20px;color:#888;">— tidak ada data —</td></tr>';
 }
 
 // ── FORM BARANG BERMASALAH (CELLMAN) ──
@@ -1099,16 +1095,14 @@ function filterBRGTable() {
   renderBRGTable(filtered, 'brg-tbody', 'cm');
 }
 
-// NO | NAMA | TANGGAL | SUBINVENTORY | UK MOTIF | ITEM DESC | LOT NO | QTY | REASON | STATUS | REASON ADMIN | PENYELESAIAN | EDIT
+// FIX Bug #5: urutan kolom di renderBRGTable disesuaikan dengan <th>
+// NO | NAMA | TANGGAL | SUBINVENTORY | UK MOTIF | ITEM DESC | LOT NO | QTY | REASON | STATUS | ACTION BY | EDIT
 function renderBRGTable(rows, tbodyId, caller) {
   var html = '';
   rows.forEach(function(r, i) {
-    // Kolom REASON ADMIN & PENYELESAIAN tampil di semua (cellman read-only, admin bisa edit)
-    var reasonAdminTd = r.reason_admin
-      ? r.reason_admin
+    var actionBy = r.action_by
+      ? '<div>' + r.action_by + '</div><div style="font-size:11px;color:#888;">' + (r.action_at ? r.action_at.slice(0,16).replace('T',' ') : '') + '</div>'
       : '<span style="color:#ccc;">—</span>';
-    var penyelesaianTd = badge(r.penyelesaian || r.status);
-    var rid = String(r.id);
     html += '<tr>' +
       '<td>' + (i+1) + '</td>' +
       '<td>' + (r.nama||'-') + '</td>' +
@@ -1120,15 +1114,14 @@ function renderBRGTable(rows, tbodyId, caller) {
       '<td>' + (r.qty||'-') + '</td>' +
       '<td>' + (r.note||'-') + '</td>' +
       '<td>' + badge(r.status) + '</td>' +
-      '<td>' + reasonAdminTd + '</td>' +
-      '<td>' + penyelesaianTd + '</td>' +
+      '<td>' + actionBy + '</td>' +
       '<td><div class="act-cell">' +
-        '<button class="btn-icon edt" data-id="' + rid + '" data-caller="' + caller + '" onclick="openEditModalBRG(this.dataset.id, this.dataset.caller)">✏️</button>' +
-        '<button class="btn-icon del" data-id="' + rid + '" data-caller="brg-' + caller + '" onclick="hapusData(this.dataset.id, this.dataset.caller)">🗑️</button>' +
+        '<button class="btn-icon edt" onclick="openEditModalBRG(\'' + r.id + '\',\'' + caller + '\')">✏️</button>' +
+        '<button class="btn-icon del" onclick="hapusData(\'' + r.id + '\',\'brg-' + caller + '\')">🗑️</button>' +
       '</div></td></tr>';
   });
   document.getElementById(tbodyId).innerHTML = html ||
-    '<tr><td colspan="13" style="text-align:center;padding:20px;color:#888;">— tidak ada data —</td></tr>';
+    '<tr><td colspan="12" style="text-align:center;padding:20px;color:#888;">— tidak ada data —</td></tr>';
 }
 
 // ── DATA TAC (ADMIN) ──
@@ -1159,6 +1152,10 @@ function filterTable() {
   });
   var html = '';
   filtered.forEach(function(r, i) {
+    var actionBy = r.action_by
+      ? '<div>' + r.action_by + '</div><div style="font-size:11px;color:#888;">' + (r.action_at ? r.action_at.slice(0,16).replace('T',' ') : '') + '</div>'
+      : '<span style="color:#ccc;">—</span>';
+    // FIX Bug #5: urutan kolom uk_motif dan item_desc dibenarkan
     html += '<tr>' +
       '<td>' + (i+1) + '</td>' +
       '<td>' + (r.nama||'-') + '</td>' +
@@ -1171,13 +1168,14 @@ function filterTable() {
       '<td>' + (r.qty||'-') + '</td>' +
       '<td>' + (r.note||'-') + '</td>' +
       '<td>' + badge(r.status) + '</td>' +
+      '<td>' + actionBy + '</td>' +
       '<td><div class="act-cell">' +
-        '<button class="btn-icon edt" data-id="' + r.id + '" data-caller="adm" onclick="openEditModal(this.dataset.id, this.dataset.caller)">✏️</button>' +
-        '<button class="btn-icon del" data-id="' + r.id + '" data-caller="adm" onclick="hapusData(this.dataset.id, this.dataset.caller)">🗑️</button>' +
+        '<button class="btn-icon edt" onclick="openEditModal(\'' + r.id + '\',\'adm\')">✏️</button>' +
+        '<button class="btn-icon del" onclick="hapusData(\'' + r.id + '\',\'adm\')">🗑️</button>' +
       '</div></td></tr>';
   });
   document.getElementById('adm-tbody').innerHTML = html ||
-    '<tr><td colspan="13" style="text-align:center;padding:20px;color:#888;">— tidak ada data —</td></tr>';
+    '<tr><td colspan="12" style="text-align:center;padding:20px;color:#888;">— tidak ada data —</td></tr>';
 }
 
 // ── DATA BARANG BERMASALAH (ADMIN) ──
@@ -1220,13 +1218,16 @@ function openEditModal(id, caller) {
   document.getElementById('me-tanggal').value   = rec.tanggal     || '';
   document.getElementById('me-from-io').value   = rec.from_sub_io || '';
   document.getElementById('me-to-io').value     = rec.to_sub_io   || '';
+  // FIX Bug #2: me-uk-motif (bukan me-motif)
   document.getElementById('me-uk-motif').value  = rec.uk_motif    || '';
   document.getElementById('me-item').value      = rec.item_desc   || '';
   document.getElementById('me-lot').value       = rec.lot_no      || '';
   document.getElementById('me-qty').value       = rec.qty         || '';
   document.getElementById('me-note').value      = rec.note        || '';
   document.getElementById('me-status').value    = rec.status      || 'DRAFT';
+  document.getElementById('me-action-by').value = rec.action_by   || '';
   document.getElementById('me-status-wrap').style.display   = caller === 'cm' ? 'none' : '';
+  document.getElementById('me-actionby-wrap').style.display = caller === 'cm' ? 'none' : '';
   document.getElementById('modal').style.display = 'flex';
 }
 
@@ -1244,6 +1245,7 @@ async function saveEdit() {
     tanggal     : document.getElementById('me-tanggal').value,
     from_sub_io : document.getElementById('me-from-io').value || '-',
     to_sub_io   : document.getElementById('me-to-io').value   || '-',
+    // FIX Bug #2: me-uk-motif
     uk_motif    : document.getElementById('me-uk-motif').value || '-',
     item_desc   : (document.getElementById('me-item').value.trim() || '-').toUpperCase(),
     lot_no      : (document.getElementById('me-lot').value.trim()  || '-').toUpperCase(),
@@ -1252,6 +1254,8 @@ async function saveEdit() {
   };
   if (editCaller === 'adm') {
     updates.status    = document.getElementById('me-status').value;
+    var actionName    = document.getElementById('me-action-by').value.trim();
+    updates.action_by = actionName ? actionName.toUpperCase() : (currentUser ? currentUser.email : '');
     updates.action_at = new Date().toISOString();
   }
   try {
@@ -1269,25 +1273,25 @@ async function saveEdit() {
 // ── MODAL EDIT BARANG BERMASALAH ──
 function openEditModalBRG(id, caller) {
   var rec = caller === 'adm'
-    ? admBrgData.find(r => String(r.id) === String(id))
-    : brgData.find(r => String(r.id) === String(id));
-  if (!rec) {
-    alert('Data tidak ditemukan. Coba klik ↺ REFRESH terlebih dahulu.');
-    return;
-  }
+    ? admBrgData.find(r => r.id === id)
+    : brgData.find(r => r.id === id);
+  if (!rec) return;
   editBrgId = id; editCaller = caller;
-  document.getElementById('mbrg-nama').value         = rec.nama        || '';
-  document.getElementById('mbrg-tanggal').value      = rec.tanggal     || '';
-  document.getElementById('mbrg-sub-io').value       = rec.from_sub_io || '';
-  document.getElementById('mbrg-uk-motif').value     = rec.uk_motif    || '';
-  document.getElementById('mbrg-item').value         = rec.item_desc   || '';
-  document.getElementById('mbrg-lot').value          = rec.lot_no      || '';
-  document.getElementById('mbrg-qty').value          = rec.qty         || '';
-  document.getElementById('mbrg-note').value         = rec.note        || '';
-  document.getElementById('mbrg-reason-admin').value = rec.reason_admin || '';
-  document.getElementById('mbrg-penyelesaian').value = rec.penyelesaian || 'WAIT';
+  document.getElementById('mbrg-nama').value      = rec.nama        || '';
+  document.getElementById('mbrg-tanggal').value   = rec.tanggal     || '';
+  document.getElementById('mbrg-sub-io').value    = rec.from_sub_io || '';
+  // FIX Bug #3: mbrg-uk-motif
+  document.getElementById('mbrg-uk-motif').value  = rec.uk_motif    || '';
+  document.getElementById('mbrg-item').value      = rec.item_desc   || '';
+  document.getElementById('mbrg-lot').value       = rec.lot_no      || '';
+  document.getElementById('mbrg-qty').value       = rec.qty         || '';
+  document.getElementById('mbrg-note').value      = rec.note        || '';
+  document.getElementById('mbrg-status').value    = rec.status      || 'DRAFT';
+  // FIX Bug #3: mbrg-action-by
+  document.getElementById('mbrg-action-by').value = rec.action_by  || '';
   var isAdm = caller === 'adm';
-  document.getElementById('mbrg-admin-wrap').style.display = isAdm ? '' : 'none';
+  document.getElementById('mbrg-status-wrap').style.display    = isAdm ? '' : 'none';
+  document.getElementById('mbrg-actionby-wrap').style.display  = isAdm ? '' : 'none';
   document.getElementById('modal-brg').style.display = 'flex';
 }
 
@@ -1304,6 +1308,7 @@ async function saveEditBRG() {
     nama        : (document.getElementById('mbrg-nama').value.trim() || '-').toUpperCase(),
     tanggal     : document.getElementById('mbrg-tanggal').value,
     from_sub_io : document.getElementById('mbrg-sub-io').value || '-',
+    // FIX Bug #3: mbrg-uk-motif
     uk_motif    : document.getElementById('mbrg-uk-motif').value  || '-',
     item_desc   : (document.getElementById('mbrg-item').value.trim() || '-').toUpperCase(),
     lot_no      : (document.getElementById('mbrg-lot').value.trim()  || '-').toUpperCase(),
@@ -1311,11 +1316,11 @@ async function saveEditBRG() {
     note        : (document.getElementById('mbrg-note').value.trim() || '-').toUpperCase()
   };
   if (editCaller === 'adm') {
-    var reasonAdmin = document.getElementById('mbrg-reason-admin').value.trim();
-    updates.reason_admin  = reasonAdmin ? reasonAdmin.toUpperCase() : '-';
-    updates.penyelesaian  = document.getElementById('mbrg-penyelesaian').value;
-    updates.status        = document.getElementById('mbrg-penyelesaian').value;
-    updates.action_at     = new Date().toISOString();
+    updates.status    = document.getElementById('mbrg-status').value;
+    // FIX Bug #3: mbrg-action-by
+    var actionName    = document.getElementById('mbrg-action-by').value.trim();
+    updates.action_by = actionName ? actionName.toUpperCase() : (currentUser ? currentUser.email : '');
+    updates.action_at = new Date().toISOString();
   }
   try {
     const { error } = await db.from('barang_bermasalah').update(updates).eq('id', editBrgId);
@@ -1374,8 +1379,9 @@ function badge(s) {
 }
 
 // ── EXCEL HELPERS ──
+// FIX Bug #4: buildExcelData — kolom UK MOTIF dipindah ke posisi yang benar (setelah FROM/TO)
 function buildExcelData(rows) {
-  var headers = ['NO','NAMA','TANGGAL','FROM SUB IO','TO SUB IO','UK MOTIF','ITEM DESC','LOT NO','QTY','NOTE','STATUS','ACTION AT'];
+  var headers = ['NO','NAMA','TANGGAL','FROM SUB IO','TO SUB IO','UK MOTIF','ITEM DESC','LOT NO','QTY','NOTE','STATUS','ACTION BY','ACTION AT'];
   var data = [headers];
   rows.forEach(function(r, i) {
     data.push([
@@ -1390,14 +1396,16 @@ function buildExcelData(rows) {
       r.qty||'-',
       r.note||'-',
       r.status||'-',
+      r.action_by||'-',
       r.action_at ? r.action_at.slice(0,16).replace('T',' ') : '-'
     ]);
   });
   return data;
 }
 
+// FIX Bug #4: buildExcelDataBRG — header dilengkapi 12 kolom sesuai data yang di-push
 function buildExcelDataBRG(rows) {
-  var headers = ['NO','NAMA','TANGGAL','SUBINVENTORY','UK MOTIF','ITEM DESC','LOT NO','QTY','REASON','STATUS','REASON ADMIN','PENYELESAIAN','ACTION AT'];
+  var headers = ['NO','NAMA','TANGGAL','SUBINVENTORY','UK MOTIF','ITEM DESC','LOT NO','QTY','REASON','STATUS','ACTION BY','ACTION AT'];
   var data = [headers];
   rows.forEach(function(r, i) {
     data.push([
@@ -1411,8 +1419,7 @@ function buildExcelDataBRG(rows) {
       r.qty||'-',
       r.note||'-',
       r.status||'-',
-      r.reason_admin||'-',
-      r.penyelesaian||'-',
+      r.action_by||'-',
       r.action_at ? r.action_at.slice(0,16).replace('T',' ') : '-'
     ]);
   });
@@ -1428,7 +1435,7 @@ function exportExcel(data, filename, colWidths) {
 }
 
 var tacCols = [{wch:5},{wch:20},{wch:12},{wch:12},{wch:12},{wch:10},{wch:22},{wch:14},{wch:8},{wch:20},{wch:10},{wch:20},{wch:18}];
-var brgCols = [{wch:5},{wch:20},{wch:12},{wch:12},{wch:10},{wch:22},{wch:14},{wch:8},{wch:24},{wch:10},{wch:24},{wch:14},{wch:18}];
+var brgCols = [{wch:5},{wch:20},{wch:12},{wch:12},{wch:10},{wch:22},{wch:14},{wch:8},{wch:24},{wch:10},{wch:20},{wch:18}];
 
 async function downloadExcelCM() {
   var dari = document.getElementById('cm-rep-dari').value;
@@ -1514,8 +1521,6 @@ window.addEventListener('load', function() {
   document.getElementById('adm-rep-sampai').value     = today;
   document.getElementById('adm-brg-rep-dari').value   = firstDay;
   document.getElementById('adm-brg-rep-sampai').value = today;
-  // Default email sesuai role awal (cellman)
-  document.getElementById('l-email').value = 'cellman@tac.com';
 });
 
 document.getElementById('modal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
