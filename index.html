@@ -380,11 +380,11 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
               <tr>
                 <th>NO</th><th>NAMA</th><th>TANGGAL</th><th>SUBINVENTORY</th><th>UK MOTIF</th>
                 <th>ITEM DESC</th><th>LOT NO</th><th>QTY</th>
-                <th>REASON</th><th>STATUS</th><th>ACTION BY</th><th>EDIT</th>
+                <th>REASON</th><th>STATUS</th><th>REASON ADMIN</th><th>PENYELESAIAN</th><th>EDIT</th>
               </tr>
             </thead>
             <tbody id="brg-tbody">
-              <tr><td colspan="12" style="text-align:center;padding:20px;color:#888;">— belum ada data —</td></tr>
+              <tr><td colspan="13" style="text-align:center;padding:20px;color:#888;">— belum ada data —</td></tr>
             </tbody>
           </table>
         </div>
@@ -452,8 +452,6 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
           </ul>
         </li>
       
-        <!-- REPORT -->
-        <li>
           <a id="adm-menu-report-parent" class="menu-parent" onclick="toggleSubmenu('adm-report')">
             <span><span class="menu-icon">📊</span>REPORT</span>
             <span class="chevron">▶</span>
@@ -523,11 +521,11 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
               <tr>
                 <th>NO</th><th>NAMA</th><th>TANGGAL</th><th>SUBINVENTORY</th><th>UK MOTIF</th>
                 <th>ITEM DESC</th><th>LOT NO</th><th>QTY</th>
-                <th>REASON</th><th>STATUS</th><th>ACTION BY</th><th>EDIT</th>
+                <th>REASON</th><th>STATUS</th><th>REASON ADMIN</th><th>PENYELESAIAN</th><th>EDIT</th>
               </tr>
             </thead>
             <tbody id="adm-brg-tbody">
-              <tr><td colspan="12" style="text-align:center;padding:20px;color:#888;">— memuat data —</td></tr>
+              <tr><td colspan="13" style="text-align:center;padding:20px;color:#888;">— memuat data —</td></tr>
             </tbody>
           </table>
         </div>
@@ -1002,10 +1000,6 @@ function filterCMTable() {
 function renderCMTable(rows) {
   var html = '';
   rows.forEach(function(r, i) {
-    var actionBy = r.action_by
-      ? '<div>' + r.action_by + '</div><div style="font-size:11px;color:#888;">' + (r.action_at ? r.action_at.slice(0,16).replace('T',' ') : '') + '</div>'
-      : '<span style="color:#ccc;">—</span>';
-    // FIX Bug #5: urutan kolom uk_motif dan item_desc dibenarkan sesuai <th>
     html += '<tr>' +
       '<td>' + (i+1) + '</td>' +
       '<td>' + (r.nama||'-') + '</td>' +
@@ -1018,10 +1012,9 @@ function renderCMTable(rows) {
       '<td>' + (r.qty||'-') + '</td>' +
       '<td>' + (r.note||'-') + '</td>' +
       '<td>' + badge(r.status) + '</td>' +
-      '<td>' + actionBy + '</td>' +
       '<td><div class="act-cell">' +
-        '<button class="btn-icon edt" onclick="openEditModal(\'' + r.id + '\',\'cm\')">✏️</button>' +
-        '<button class="btn-icon del" onclick="hapusData(\'' + r.id + '\',\'cm\')">🗑️</button>' +
+        '<button class="btn-icon edt" data-id="' + r.id + '" data-caller="cm" onclick="openEditModal(this.dataset.id,this.dataset.caller)">✏️</button>' +
+        '<button class="btn-icon del" data-id="' + r.id + '" data-caller="cm" onclick="hapusData(this.dataset.id,this.dataset.caller)">🗑️</button>' +
       '</div></td></tr>';
   });
   document.getElementById('cm-tbody').innerHTML = html ||
@@ -1100,9 +1093,6 @@ function filterBRGTable() {
 function renderBRGTable(rows, tbodyId, caller) {
   var html = '';
   rows.forEach(function(r, i) {
-    var actionBy = r.action_by
-      ? '<div>' + r.action_by + '</div><div style="font-size:11px;color:#888;">' + (r.action_at ? r.action_at.slice(0,16).replace('T',' ') : '') + '</div>'
-      : '<span style="color:#ccc;">—</span>';
     html += '<tr>' +
       '<td>' + (i+1) + '</td>' +
       '<td>' + (r.nama||'-') + '</td>' +
@@ -1114,14 +1104,15 @@ function renderBRGTable(rows, tbodyId, caller) {
       '<td>' + (r.qty||'-') + '</td>' +
       '<td>' + (r.note||'-') + '</td>' +
       '<td>' + badge(r.status) + '</td>' +
-      '<td>' + actionBy + '</td>' +
+      '<td>' + (r.reason_admin || '<span style="color:#ccc;">—</span>') + '</td>' +
+      '<td>' + badge(r.penyelesaian || r.status) + '</td>' +
       '<td><div class="act-cell">' +
-        '<button class="btn-icon edt" onclick="openEditModalBRG(\'' + r.id + '\',\'' + caller + '\')">✏️</button>' +
-        '<button class="btn-icon del" onclick="hapusData(\'' + r.id + '\',\'brg-' + caller + '\')">🗑️</button>' +
+        '<button class="btn-icon edt" data-id="' + String(r.id) + '" data-caller="' + caller + '" onclick="openEditModalBRG(this.dataset.id,this.dataset.caller)">✏️</button>' +
+        '<button class="btn-icon del" data-id="' + String(r.id) + '" data-caller="brg-' + caller + '" onclick="hapusData(this.dataset.id,this.dataset.caller)">🗑️</button>' +
       '</div></td></tr>';
   });
   document.getElementById(tbodyId).innerHTML = html ||
-    '<tr><td colspan="12" style="text-align:center;padding:20px;color:#888;">— tidak ada data —</td></tr>';
+    '<tr><td colspan="13" style="text-align:center;padding:20px;color:#888;">— tidak ada data —</td></tr>';
 }
 
 // ── DATA TAC (ADMIN) ──
@@ -1152,10 +1143,6 @@ function filterTable() {
   });
   var html = '';
   filtered.forEach(function(r, i) {
-    var actionBy = r.action_by
-      ? '<div>' + r.action_by + '</div><div style="font-size:11px;color:#888;">' + (r.action_at ? r.action_at.slice(0,16).replace('T',' ') : '') + '</div>'
-      : '<span style="color:#ccc;">—</span>';
-    // FIX Bug #5: urutan kolom uk_motif dan item_desc dibenarkan
     html += '<tr>' +
       '<td>' + (i+1) + '</td>' +
       '<td>' + (r.nama||'-') + '</td>' +
@@ -1168,10 +1155,9 @@ function filterTable() {
       '<td>' + (r.qty||'-') + '</td>' +
       '<td>' + (r.note||'-') + '</td>' +
       '<td>' + badge(r.status) + '</td>' +
-      '<td>' + actionBy + '</td>' +
       '<td><div class="act-cell">' +
-        '<button class="btn-icon edt" onclick="openEditModal(\'' + r.id + '\',\'adm\')">✏️</button>' +
-        '<button class="btn-icon del" onclick="hapusData(\'' + r.id + '\',\'adm\')">🗑️</button>' +
+        '<button class="btn-icon edt" data-id="' + r.id + '" data-caller="adm" onclick="openEditModal(this.dataset.id,this.dataset.caller)">✏️</button>' +
+        '<button class="btn-icon del" data-id="' + r.id + '" data-caller="adm" onclick="hapusData(this.dataset.id,this.dataset.caller)">🗑️</button>' +
       '</div></td></tr>';
   });
   document.getElementById('adm-tbody').innerHTML = html ||
@@ -1273,25 +1259,26 @@ async function saveEdit() {
 // ── MODAL EDIT BARANG BERMASALAH ──
 function openEditModalBRG(id, caller) {
   var rec = caller === 'adm'
-    ? admBrgData.find(r => r.id === id)
-    : brgData.find(r => r.id === id);
-  if (!rec) return;
+    ? admBrgData.find(r => String(r.id) === String(id))
+    : brgData.find(r => String(r.id) === String(id));
+  if (!rec) {
+    alert('Data tidak ditemukan. Klik ↺ REFRESH lalu coba lagi.');
+    return;
+  }
   editBrgId = id; editCaller = caller;
-  document.getElementById('mbrg-nama').value      = rec.nama        || '';
-  document.getElementById('mbrg-tanggal').value   = rec.tanggal     || '';
-  document.getElementById('mbrg-sub-io').value    = rec.from_sub_io || '';
-  // FIX Bug #3: mbrg-uk-motif
-  document.getElementById('mbrg-uk-motif').value  = rec.uk_motif    || '';
-  document.getElementById('mbrg-item').value      = rec.item_desc   || '';
-  document.getElementById('mbrg-lot').value       = rec.lot_no      || '';
-  document.getElementById('mbrg-qty').value       = rec.qty         || '';
-  document.getElementById('mbrg-note').value      = rec.note        || '';
-  document.getElementById('mbrg-status').value    = rec.status      || 'DRAFT';
-  // FIX Bug #3: mbrg-action-by
-  document.getElementById('mbrg-action-by').value = rec.action_by  || '';
+  document.getElementById('mbrg-nama').value         = rec.nama         || '';
+  document.getElementById('mbrg-tanggal').value      = rec.tanggal      || '';
+  document.getElementById('mbrg-sub-io').value       = rec.from_sub_io  || '';
+  document.getElementById('mbrg-uk-motif').value     = rec.uk_motif     || '';
+  document.getElementById('mbrg-item').value         = rec.item_desc    || '';
+  document.getElementById('mbrg-lot').value          = rec.lot_no       || '';
+  document.getElementById('mbrg-qty').value          = rec.qty          || '';
+  document.getElementById('mbrg-note').value         = rec.note         || '';
+  document.getElementById('mbrg-status').value       = rec.status       || 'DRAFT';
+  document.getElementById('mbrg-action-by').value    = rec.action_by    || '';
   var isAdm = caller === 'adm';
-  document.getElementById('mbrg-status-wrap').style.display    = isAdm ? '' : 'none';
-  document.getElementById('mbrg-actionby-wrap').style.display  = isAdm ? '' : 'none';
+  document.getElementById('mbrg-status-wrap').style.display   = isAdm ? '' : 'none';
+  document.getElementById('mbrg-actionby-wrap').style.display = isAdm ? '' : 'none';
   document.getElementById('modal-brg').style.display = 'flex';
 }
 
@@ -1316,11 +1303,16 @@ async function saveEditBRG() {
     note        : (document.getElementById('mbrg-note').value.trim() || '-').toUpperCase()
   };
   if (editCaller === 'adm') {
-    updates.status    = document.getElementById('mbrg-status').value;
-    // FIX Bug #3: mbrg-action-by
-    var actionName    = document.getElementById('mbrg-action-by').value.trim();
-    updates.action_by = actionName ? actionName.toUpperCase() : (currentUser ? currentUser.email : '');
-    updates.action_at = new Date().toISOString();
+    updates.status       = document.getElementById('mbrg-status').value;
+    var actionName       = document.getElementById('mbrg-action-by').value.trim();
+    updates.action_by    = actionName ? actionName.toUpperCase() : (currentUser ? currentUser.email : '');
+    updates.action_at    = new Date().toISOString();
+    updates.penyelesaian = document.getElementById('mbrg-status').value;
+    var raWrap = document.getElementById('mbrg-reason-admin');
+    if (raWrap) {
+      var ra = raWrap.value.trim();
+      updates.reason_admin = ra ? ra.toUpperCase() : '-';
+    }
   }
   try {
     const { error } = await db.from('barang_bermasalah').update(updates).eq('id', editBrgId);
