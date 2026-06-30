@@ -284,11 +284,11 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
               <tr>
                 <th>NO</th><th>NAMA</th><th>TANGGAL</th><th>FROM SUB IO</th>
                 <th>TO SUB IO</th><th>UK MOTIF</th><th>ITEM DESC</th><th>LOT NO</th>
-                <th>QTY</th><th>NOTE</th><th>STATUS</th><th>EDIT</th>
+                <th>QTY</th><th>NOTE</th><th>STATUS</th><th>ACTION BY</th><th>EDIT</th>
               </tr>
             </thead>
             <tbody id="cm-tbody">
-              <tr><td colspan="12" style="text-align:center;padding:20px;color:#888;">— belum ada data —</td></tr>
+              <tr><td colspan="13" style="text-align:center;padding:20px;color:#888;">— belum ada data —</td></tr>
             </tbody>
           </table>
         </div>
@@ -382,11 +382,11 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
               <tr>
                 <th>NO</th><th>NAMA</th><th>TANGGAL</th><th>SUBINVENTORY</th><th>UK MOTIF</th>
                 <th>ITEM DESC</th><th>LOT NO</th><th>QTY</th>
-                <th>REASON</th><th>STATUS</th><th>REASON ADMIN</th><th>PENYELESAIAN</th><th>EDIT</th>
+                <th>REASON</th><th>STATUS</th><th>REASON ADMIN</th><th>PENYELESAIAN</th><th>ACTION BY</th><th>EDIT</th>
               </tr>
             </thead>
             <tbody id="brg-tbody">
-              <tr><td colspan="13" style="text-align:center;padding:20px;color:#888;">— belum ada data —</td></tr>
+              <tr><td colspan="14" style="text-align:center;padding:20px;color:#888;">— belum ada data —</td></tr>
             </tbody>
           </table>
         </div>
@@ -1026,13 +1026,14 @@ function renderCMTable(rows) {
       '<td>' + (r.qty||'-') + '</td>' +
       '<td>' + (r.note||'-') + '</td>' +
       '<td>' + badge(r.status) + '</td>' +
+      '<td>' + (r.action_by || '<span style="color:#ccc;">—</span>') + '</td>' +
       '<td><div class="act-cell">' +
         '<button class="btn-icon edt" data-id="' + r.id + '" data-caller="cm" onclick="openEditModal(this.dataset.id,this.dataset.caller)">✏️</button>' +
         '<button class="btn-icon del" data-id="' + r.id + '" data-caller="cm" onclick="hapusData(this.dataset.id,this.dataset.caller)">🗑️</button>' +
       '</div></td></tr>';
   });
   document.getElementById('cm-tbody').innerHTML = html ||
-    '<tr><td colspan="12" style="text-align:center;padding:20px;color:#888;">— tidak ada data —</td></tr>';
+    '<tr><td colspan="13" style="text-align:center;padding:20px;color:#888;">— tidak ada data —</td></tr>';
 }
 
 // ── FORM BARANG BERMASALAH (CELLMAN) ──
@@ -1118,13 +1119,14 @@ function renderBRGTable(rows, tbodyId, caller) {
       '<td>' + badge(r.status) + '</td>' +
       '<td>' + (r.reason_admin || '<span style="color:#ccc;">—</span>') + '</td>' +
       '<td>' + badge(r.penyelesaian || r.status) + '</td>' +
+      '<td>' + (r.action_by || '<span style="color:#ccc;">—</span>') + '</td>' +
       '<td><div class="act-cell">' +
         '<button class="btn-icon edt" data-id="' + String(r.id) + '" data-caller="' + caller + '" onclick="openEditModalBRG(this.dataset.id,this.dataset.caller)">✏️</button>' +
         '<button class="btn-icon del" data-id="' + String(r.id) + '" data-caller="brg-' + caller + '" onclick="hapusData(this.dataset.id,this.dataset.caller)">🗑️</button>' +
       '</div></td></tr>';
   });
   document.getElementById(tbodyId).innerHTML = html ||
-    '<tr><td colspan="13" style="text-align:center;padding:20px;color:#888;">— tidak ada data —</td></tr>';
+    '<tr><td colspan="14" style="text-align:center;padding:20px;color:#888;">— tidak ada data —</td></tr>';
 }
 
 // ── DATA TAC (ADMIN) ──
