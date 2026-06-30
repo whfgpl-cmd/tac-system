@@ -11,6 +11,7 @@
 body{font-family:Arial,sans-serif;font-size:14px;background:#fff;color:#000;}
 input,select,textarea{width:100%;border:1px solid #999;padding:6px 8px;font-size:14px;font-family:Arial;}
 input:focus,select:focus,textarea:focus{outline:2px solid #000;}
+input:disabled,select:disabled{background:#f5f5f5;color:#888;cursor:not-allowed;border-color:#ccc;}
 button{padding:7px 16px;font-size:14px;font-family:Arial;cursor:pointer;border:1px solid #000;background:#000;color:#fff;}
 button.outline{background:#fff;color:#000;}
 button:hover{opacity:.8;}
@@ -74,6 +75,7 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
 .submenu li a{padding:8px 16px 8px 38px;font-size:12px;color:#aaa;}
 .submenu li a:hover{background:#1a1a1a;color:#fff;}
 .submenu li a.active{background:#262626;color:#fff;font-weight:bold;border-left:3px solid #fff;}
+.readonly-info{font-size:11px;color:#888;font-style:italic;margin-top:2px;}
 @media (max-width: 640px) {
   .sidebar{position:fixed;top:0;left:0;height:100vh;z-index:200;width:0;transition:width .25s ease;}
   .sidebar.open-mobile{width:220px;}
@@ -451,7 +453,7 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
             <li><a id="adm-sub-data-brg" onclick="admShowPage('data-brg')">Barang Bermasalah</a></li>
           </ul>
         </li>
-      
+        <li>
           <a id="adm-menu-report-parent" class="menu-parent" onclick="toggleSubmenu('adm-report')">
             <span><span class="menu-icon">📊</span>REPORT</span>
             <span class="chevron">▶</span>
@@ -581,10 +583,7 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════
-     MODAL EDIT TAC
-     FIX Bug #2: id field motif diubah dari me-motif → me-uk-motif
-     ═══════════════════════════════════════════════════════ -->
+<!-- MODAL EDIT TAC -->
 <div id="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:center;justify-content:center;overflow-y:auto;">
   <div style="background:#fff;border:2px solid #000;padding:24px;width:100%;max-width:560px;margin:16px;">
     <h2 style="margin-bottom:14px;">✏️ EDIT DATA TAC</h2>
@@ -626,7 +625,6 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
         </select>
       </div>
     </div>
-    <!-- FIX Bug #2: id="me-uk-motif" (sebelumnya me-motif) -->
     <div class="fgroup">
       <label class="flabel">UKURAN MOTIF</label>
       <select id="me-uk-motif">
@@ -663,10 +661,12 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
         </select>
       </div>
     </div>
+    <!-- ACTION BY — selalu tampil; readonly saat Cellman, editable saat Admin -->
     <div style="display:flex;gap:10px;flex-wrap:wrap;" id="me-actionby-wrap">
       <div class="fgroup" style="flex:1;min-width:200px;">
-        <label class="flabel">ACTION BY <span style="font-weight:normal;color:#888;font-size:11px;"></span></label>
-        <input type="text" id="me-action-by" placeholder="contoh: Ahmad">
+        <label class="flabel" id="me-action-by-label">ACTION BY</label>
+        <input type="text" id="me-action-by" placeholder="—">
+        <div class="readonly-info" id="me-action-by-hint" style="display:none;">Diisi oleh Admin — tidak dapat diubah</div>
       </div>
     </div>
     <div style="display:flex;gap:8px;margin-top:12px;">
@@ -676,11 +676,7 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════
-     MODAL EDIT BARANG BERMASALAH (ADMIN)
-     FIX Bug #1: div penutup modal-brg diperbaiki (sebelumnya modal-del ada di DALAM modal-brg)
-     FIX Bug #3: tambah id="mbrg-uk-motif" dan id="mbrg-action-by" yang hilang
-     ═══════════════════════════════════════════════════════ -->
+<!-- MODAL EDIT BARANG BERMASALAH (ADMIN) -->
 <div id="modal-brg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:center;justify-content:center;overflow-y:auto;">
   <div style="background:#fff;border:2px solid #000;padding:24px;width:100%;max-width:560px;margin:16px;">
     <h2 style="margin-bottom:14px;">✏️ EDIT BARANG BERMASALAH</h2>
@@ -708,7 +704,6 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
           <option>FG20</option><option>DISPUT</option>
         </select>
       </div>
-      <!-- FIX Bug #3: id="mbrg-uk-motif" ditambahkan (sebelumnya tidak ada) -->
       <div class="fgroup" style="flex:1;min-width:110px;">
         <label class="flabel">UKURAN MOTIF</label>
         <select id="mbrg-uk-motif">
@@ -746,11 +741,12 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
         </select>
       </div>
     </div>
-    <!-- FIX Bug #3: id="mbrg-action-by" ditambahkan (sebelumnya tidak ada di HTML) -->
+    <!-- ACTION BY — selalu tampil; readonly saat Cellman, editable saat Admin -->
     <div style="display:flex;gap:10px;flex-wrap:wrap;" id="mbrg-actionby-wrap">
       <div class="fgroup" style="flex:1;min-width:200px;">
-        <label class="flabel">ACTION BY <span style="font-weight:normal;color:#888;font-size:11px;">(nama admin — isi manual)</span></label>
-        <input type="text" id="mbrg-action-by" placeholder="contoh: Ahmad">
+        <label class="flabel" id="mbrg-action-by-label">ACTION BY</label>
+        <input type="text" id="mbrg-action-by" placeholder="—">
+        <div class="readonly-info" id="mbrg-action-by-hint" style="display:none;">Diisi oleh Admin — tidak dapat diubah</div>
       </div>
     </div>
     <div style="display:flex;gap:8px;margin-top:12px;">
@@ -759,7 +755,6 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
     </div>
   </div>
 </div>
-<!-- FIX Bug #1: modal-brg DITUTUP DI SINI, bukan di dalam dirinya sendiri -->
 
 <!-- MODAL HAPUS -->
 <div id="modal-del" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;">
@@ -839,7 +834,6 @@ async function doLogin() {
   var err   = document.getElementById('l-err');
   err.innerHTML = '';
 
-  // Validasi role vs email
   if (role === 'admin' && !isAdminEmail(email)) {
     err.innerHTML = '<div class="msg err">Email ini tidak terdaftar sebagai Admin.</div>';
     return;
@@ -1108,8 +1102,6 @@ function filterBRGTable() {
   renderBRGTable(filtered, 'brg-tbody', 'cm');
 }
 
-// FIX Bug #5: urutan kolom di renderBRGTable disesuaikan dengan <th>
-// NO | NAMA | TANGGAL | SUBINVENTORY | UK MOTIF | ITEM DESC | LOT NO | QTY | REASON | STATUS | ACTION BY | EDIT
 function renderBRGTable(rows, tbodyId, caller) {
   var html = '';
   rows.forEach(function(r, i) {
@@ -1228,7 +1220,6 @@ function openEditModal(id, caller) {
   document.getElementById('me-tanggal').value   = rec.tanggal     || '';
   document.getElementById('me-from-io').value   = rec.from_sub_io || '';
   document.getElementById('me-to-io').value     = rec.to_sub_io   || '';
-  // FIX Bug #2: me-uk-motif (bukan me-motif)
   document.getElementById('me-uk-motif').value  = rec.uk_motif    || '';
   document.getElementById('me-item').value      = rec.item_desc   || '';
   document.getElementById('me-lot').value       = rec.lot_no      || '';
@@ -1236,8 +1227,18 @@ function openEditModal(id, caller) {
   document.getElementById('me-note').value      = rec.note        || '';
   document.getElementById('me-status').value    = rec.status      || 'DRAFT';
   document.getElementById('me-action-by').value = rec.action_by   || '';
-  document.getElementById('me-status-wrap').style.display   = caller === 'cm' ? 'none' : '';
-  document.getElementById('me-actionby-wrap').style.display = caller === 'cm' ? 'none' : '';
+
+  var isCM = caller === 'cm';
+  // STATUS: sembunyikan untuk CM
+  document.getElementById('me-status-wrap').style.display = isCM ? 'none' : '';
+  // ACTION BY: selalu tampil, tapi readonly jika CM
+  document.getElementById('me-actionby-wrap').style.display = '';
+  document.getElementById('me-action-by').disabled = isCM;
+  document.getElementById('me-action-by-hint').style.display = isCM ? '' : 'none';
+  document.getElementById('me-action-by-label').textContent = isCM
+    ? 'ACTION BY (info)'
+    : 'ACTION BY (nama admin — isi manual)';
+
   document.getElementById('modal').style.display = 'flex';
 }
 
@@ -1255,7 +1256,6 @@ async function saveEdit() {
     tanggal     : document.getElementById('me-tanggal').value,
     from_sub_io : document.getElementById('me-from-io').value || '-',
     to_sub_io   : document.getElementById('me-to-io').value   || '-',
-    // FIX Bug #2: me-uk-motif
     uk_motif    : document.getElementById('me-uk-motif').value || '-',
     item_desc   : (document.getElementById('me-item').value.trim() || '-').toUpperCase(),
     lot_no      : (document.getElementById('me-lot').value.trim()  || '-').toUpperCase(),
@@ -1300,9 +1300,18 @@ function openEditModalBRG(id, caller) {
   document.getElementById('mbrg-note').value         = rec.note         || '';
   document.getElementById('mbrg-status').value       = rec.status       || 'DRAFT';
   document.getElementById('mbrg-action-by').value    = rec.action_by    || '';
+
   var isAdm = caller === 'adm';
-  document.getElementById('mbrg-status-wrap').style.display   = isAdm ? '' : 'none';
-  document.getElementById('mbrg-actionby-wrap').style.display = isAdm ? '' : 'none';
+  // STATUS: sembunyikan untuk CM
+  document.getElementById('mbrg-status-wrap').style.display = isAdm ? '' : 'none';
+  // ACTION BY: selalu tampil, tapi readonly jika CM
+  document.getElementById('mbrg-actionby-wrap').style.display = '';
+  document.getElementById('mbrg-action-by').disabled = !isAdm;
+  document.getElementById('mbrg-action-by-hint').style.display = !isAdm ? '' : 'none';
+  document.getElementById('mbrg-action-by-label').textContent = !isAdm
+    ? 'ACTION BY (info)'
+    : 'ACTION BY (nama admin — isi manual)';
+
   document.getElementById('modal-brg').style.display = 'flex';
 }
 
@@ -1319,7 +1328,6 @@ async function saveEditBRG() {
     nama        : (document.getElementById('mbrg-nama').value.trim() || '-').toUpperCase(),
     tanggal     : document.getElementById('mbrg-tanggal').value,
     from_sub_io : document.getElementById('mbrg-sub-io').value || '-',
-    // FIX Bug #3: mbrg-uk-motif
     uk_motif    : document.getElementById('mbrg-uk-motif').value  || '-',
     item_desc   : (document.getElementById('mbrg-item').value.trim() || '-').toUpperCase(),
     lot_no      : (document.getElementById('mbrg-lot').value.trim()  || '-').toUpperCase(),
@@ -1395,7 +1403,6 @@ function badge(s) {
 }
 
 // ── EXCEL HELPERS ──
-// FIX Bug #4: buildExcelData — kolom UK MOTIF dipindah ke posisi yang benar (setelah FROM/TO)
 function buildExcelData(rows) {
   var headers = ['NO','NAMA','TANGGAL','FROM SUB IO','TO SUB IO','UK MOTIF','ITEM DESC','LOT NO','QTY','NOTE','STATUS','ACTION BY','ACTION AT'];
   var data = [headers];
@@ -1419,7 +1426,6 @@ function buildExcelData(rows) {
   return data;
 }
 
-// FIX Bug #4: buildExcelDataBRG — header dilengkapi 12 kolom sesuai data yang di-push
 function buildExcelDataBRG(rows) {
   var headers = ['NO','NAMA','TANGGAL','SUBINVENTORY','UK MOTIF','ITEM DESC','LOT NO','QTY','REASON','STATUS','ACTION BY','ACTION AT'];
   var data = [headers];
@@ -1537,7 +1543,6 @@ window.addEventListener('load', function() {
   document.getElementById('adm-rep-sampai').value     = today;
   document.getElementById('adm-brg-rep-dari').value   = firstDay;
   document.getElementById('adm-brg-rep-sampai').value = today;
-  // Default email sesuai role awal (cellman)
   document.getElementById('l-email').value = 'cellman@tac.com';
 });
 
