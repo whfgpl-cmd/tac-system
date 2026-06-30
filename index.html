@@ -1552,6 +1552,33 @@ window.addEventListener('load', function() {
 document.getElementById('modal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
 document.getElementById('modal-del').addEventListener('click', function(e) { if (e.target === this) closeDelModal(); });
 document.getElementById('modal-brg').addEventListener('click', function(e) { if (e.target === this) closeModalBRG(); });
+
+// ── BACK BUTTON HANDLER (Android / browser) ──
+// Setiap kali state berubah, push history agar tombol back tidak keluar app
+function pushState() {
+  history.pushState({ app: true }, '');
+}
+
+// Push state awal saat halaman load
+history.pushState({ app: true }, '');
+
+window.addEventListener('popstate', function(e) {
+  // Selalu push state baru agar back tidak pernah keluar web
+  history.pushState({ app: true }, '');
+
+  // Jika ada modal terbuka, tutup dulu
+  if (document.getElementById('modal').style.display === 'flex') {
+    closeModal(); return;
+  }
+  if (document.getElementById('modal-brg').style.display === 'flex') {
+    closeModalBRG(); return;
+  }
+  if (document.getElementById('modal-del').style.display === 'flex') {
+    closeDelModal(); return;
+  }
+  // Tidak ada aksi lain — tetap di halaman yang sama, tidak logout
+});
+
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Enter' && document.getElementById('pg-login').classList.contains('on')) doLogin();
   if (e.key === 'Enter' && document.getElementById('cm-search') === document.activeElement) filterCMTable();
