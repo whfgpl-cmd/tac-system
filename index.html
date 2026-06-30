@@ -821,15 +821,34 @@ function setRole(r) {
   role = r;
   document.getElementById('rb-cm').className  = r === 'cellman' ? '' : 'outline';
   document.getElementById('rb-adm').className = r === 'admin'   ? '' : 'outline';
+  document.getElementById('l-email').value = r === 'cellman' ? 'cellman@tac.com' : 'admin@tac.com';
+  document.getElementById('l-pass').value  = '';
+  document.getElementById('l-err').innerHTML = '';
+  document.getElementById('l-pass').focus();
 }
 
 // ── AUTH ──
+var ADMIN_EMAILS = ['admin@tac.com'];
+function isAdminEmail(email) {
+  return ADMIN_EMAILS.some(function(a) { return a.toLowerCase() === email.toLowerCase(); });
+}
 async function doLogin() {
   var email = document.getElementById('l-email').value.trim();
   var pass  = document.getElementById('l-pass').value;
   var btn   = document.getElementById('btn-login');
   var err   = document.getElementById('l-err');
   err.innerHTML = '';
+
+  // Validasi role vs email
+  if (role === 'admin' && !isAdminEmail(email)) {
+    err.innerHTML = '<div class="msg err">Email ini tidak terdaftar sebagai Admin.</div>';
+    return;
+  }
+  if (role === 'cellman' && isAdminEmail(email)) {
+    err.innerHTML = '<div class="msg err">Akun Admin tidak bisa login sebagai Cellman.</div>';
+    return;
+  }
+
   btn.disabled = true; btn.textContent = 'MEMPROSES...';
   try {
     const { data, error } = await db.auth.signInWithPassword({ email, password: pass });
@@ -839,6 +858,7 @@ async function doLogin() {
       document.getElementById('adm-email-label').textContent = email;
       show('pg-admin');
       loadADMData();
+      loadADMBRGData();
     } else {
       document.getElementById('cm-name-label').textContent = email;
       show('pg-cellman');
@@ -1117,13 +1137,15 @@ function renderBRGTable(rows, tbodyId, caller) {
 
 // ── DATA TAC (ADMIN) ──
 async function loadADMData() {
-  document.getElementById('adm-msg').innerHTML = '';
+  document.getElementById('adm-msg').innerHTML = '<div class="msg ok" style="font-size:11px;">⏳ Memuat data...</div>';
   const { data, error } = await db.from('tac')
-    .select('*').order('created_at', { ascending: false });
+    .select('*')
+    .order('created_at', { ascending: false });
   if (error) {
     document.getElementById('adm-msg').innerHTML = '<div class="msg err">Error: ' + error.message + '</div>';
     return;
   }
+  document.getElementById('adm-msg').innerHTML = '';
   allData = data || [];
   filterTable();
 }
@@ -1166,13 +1188,15 @@ function filterTable() {
 
 // ── DATA BARANG BERMASALAH (ADMIN) ──
 async function loadADMBRGData() {
-  document.getElementById('adm-brg-msg').innerHTML = '';
+  document.getElementById('adm-brg-msg').innerHTML = '<div class="msg ok" style="font-size:11px;">⏳ Memuat data...</div>';
   const { data, error } = await db.from('barang_bermasalah')
-    .select('*').order('created_at', { ascending: false });
+    .select('*')
+    .order('created_at', { ascending: false });
   if (error) {
     document.getElementById('adm-brg-msg').innerHTML = '<div class="msg err">Error: ' + error.message + '</div>';
     return;
   }
+  document.getElementById('adm-brg-msg').innerHTML = '';
   admBrgData = data || [];
   filterADMBRGTable();
 }
@@ -1513,6 +1537,8 @@ window.addEventListener('load', function() {
   document.getElementById('adm-rep-sampai').value     = today;
   document.getElementById('adm-brg-rep-dari').value   = firstDay;
   document.getElementById('adm-brg-rep-sampai').value = today;
+  // Default email sesuai role awal (cellman)
+  document.getElementById('l-email').value = 'cellman@tac.com';
 });
 
 document.getElementById('modal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
