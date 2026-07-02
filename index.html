@@ -94,6 +94,30 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
 .menu-notif-badge{display:inline-block;background:#c00;color:#fff;font-size:10px;font-weight:bold;border-radius:10px;padding:1px 6px;margin-left:6px;min-width:16px;text-align:center;line-height:1.3;vertical-align:middle;}
 .menu-parent .menu-notif-badge{margin-left:auto;margin-right:6px;}
 
+/* NOTIF BELL */
+.notif-wrap{position:relative;}
+.btn-bell{background:none;border:none;color:#fff;font-size:18px;cursor:pointer;padding:4px 6px;position:relative;line-height:1;}
+.btn-bell:hover{opacity:.75;}
+.bell-badge{position:absolute;top:-2px;right:-2px;background:#c00;color:#fff;font-size:10px;font-weight:bold;border-radius:9px;padding:1px 5px;min-width:15px;text-align:center;line-height:1.3;display:none;}
+.notif-dropdown{display:none;position:absolute;top:calc(100% + 10px);right:0;width:320px;max-width:90vw;background:#fff;color:#000;border:1px solid #000;box-shadow:0 6px 18px rgba(0,0,0,.25);z-index:400;max-height:420px;display:flex;flex-direction:column;}
+.notif-dropdown.open{display:flex;}
+.notif-dd-head{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-bottom:1px solid #ddd;background:#f7f7f7;flex-shrink:0;}
+.notif-dd-head strong{font-size:13px;}
+.notif-dd-head button{padding:3px 8px;font-size:11px;}
+.notif-dd-list{overflow-y:auto;flex:1;}
+.notif-dd-item{display:flex;gap:10px;padding:10px 12px;border-bottom:1px solid #eee;cursor:pointer;align-items:flex-start;}
+.notif-dd-item:hover{background:#f5f5f5;}
+.notif-dd-item.unread{background:#fafaff;}
+.notif-dd-item .ni-icon{font-size:17px;flex-shrink:0;margin-top:1px;}
+.notif-dd-item .ni-body{flex:1;min-width:0;}
+.notif-dd-item .ni-title{font-size:12.5px;font-weight:bold;}
+.notif-dd-item .ni-desc{font-size:11.5px;color:#555;margin-top:1px;word-break:break-word;}
+.notif-dd-item .ni-time{font-size:10px;color:#999;margin-top:3px;}
+.notif-dd-empty{padding:26px 12px;text-align:center;font-size:12px;color:#888;}
+@media (max-width:640px){
+  .notif-dropdown{position:fixed;top:50px;right:8px;left:8px;width:auto;max-width:none;}
+}
+
 @media (max-width: 640px) {
   .sidebar{position:fixed;top:0;left:0;height:100vh;z-index:200;width:0;transition:width .25s ease;}
   .sidebar.open-mobile{width:220px;}
@@ -169,6 +193,20 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
       <strong>TAC SYSTEM</strong>
     </div>
     <div class="topbar-right">
+      <div class="notif-wrap">
+        <button class="btn-bell" onclick="toggleNotifDropdown('cm')" title="Notifikasi">
+          🔔<span class="bell-badge" id="bell-badge-cm">0</span>
+        </button>
+        <div class="notif-dropdown" id="notif-dropdown-cm">
+          <div class="notif-dd-head">
+            <strong>Notifikasi</strong>
+            <button class="outline" onclick="clearAllNotif('cm')">Tandai dibaca</button>
+          </div>
+          <div class="notif-dd-list" id="notif-list-cm">
+            <div class="notif-dd-empty">— belum ada notifikasi —</div>
+          </div>
+        </div>
+      </div>
       <span id="cm-name-label" style="font-size:12px;opacity:.7;"></span>
       <button onclick="doLogout()" style="padding:4px 10px;font-size:12px;">KELUAR</button>
     </div>
@@ -455,6 +493,20 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
       <strong>TAC SYSTEM — ADMIN</strong>
     </div>
     <div class="topbar-right">
+      <div class="notif-wrap">
+        <button class="btn-bell" onclick="toggleNotifDropdown('adm')" title="Notifikasi">
+          🔔<span class="bell-badge" id="bell-badge-adm">0</span>
+        </button>
+        <div class="notif-dropdown" id="notif-dropdown-adm">
+          <div class="notif-dd-head">
+            <strong>Notifikasi</strong>
+            <button class="outline" onclick="clearAllNotif('adm')">Tandai dibaca</button>
+          </div>
+          <div class="notif-dd-list" id="notif-list-adm">
+            <div class="notif-dd-empty">— belum ada notifikasi —</div>
+          </div>
+        </div>
+      </div>
       <span id="adm-email-label" style="font-size:12px;opacity:.7;"></span>
       <button onclick="doLogout()" style="padding:4px 10px;font-size:12px;">KELUAR</button>
     </div>
@@ -810,6 +862,9 @@ var delCaller = 'adm';
 // ── REALTIME & NOTIFIKASI ──
 var rtChannel = null;
 var badgeCounts = { 'cm-tac':0, 'cm-brg':0, 'adm-tac':0, 'adm-brg':0 };
+var notifHistory = { cm: [], adm: [] };
+var notifUnread  = { cm: 0, adm: 0 };
+var notifSeq = 0;
 
 // ── SIDEBAR ──
 function toggleSidebar(who) {
@@ -1574,6 +1629,103 @@ function showToast(icon, title, desc) {
   }, 4500);
 }
 
+// ── BELL NOTIFIKASI (dropdown riwayat) ──
+function escHtml(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function timeAgo(ts) {
+  var diff = Math.floor((Date.now() - ts) / 1000);
+  if (diff < 5) return 'baru saja';
+  if (diff < 60) return diff + ' dtk lalu';
+  if (diff < 3600) return Math.floor(diff/60) + ' mnt lalu';
+  if (diff < 86400) return Math.floor(diff/3600) + ' jam lalu';
+  return Math.floor(diff/86400) + ' hari lalu';
+}
+
+// scope: 'cm' atau 'adm'
+function addNotif(scope, icon, title, desc, page) {
+  notifSeq++;
+  var item = { id: notifSeq, icon: icon, title: title, desc: desc || '', page: page || null, ts: Date.now(), read: false };
+  notifHistory[scope].unshift(item);
+  if (notifHistory[scope].length > 30) notifHistory[scope].length = 30;
+  notifUnread[scope]++;
+  renderNotifBell(scope);
+  // toast tetap muncul juga
+  showToast(icon, title, desc);
+}
+
+function renderNotifBell(scope) {
+  var badgeEl = document.getElementById('bell-badge-' + scope);
+  if (badgeEl) {
+    if (notifUnread[scope] > 0) {
+      badgeEl.textContent = notifUnread[scope] > 99 ? '99+' : notifUnread[scope];
+      badgeEl.style.display = 'inline-block';
+    } else {
+      badgeEl.style.display = 'none';
+    }
+  }
+  var listEl = document.getElementById('notif-list-' + scope);
+  if (!listEl) return;
+  var items = notifHistory[scope];
+  if (!items.length) {
+    listEl.innerHTML = '<div class="notif-dd-empty">— belum ada notifikasi —</div>';
+    return;
+  }
+  var html = '';
+  items.forEach(function(n) {
+    html += '<div class="notif-dd-item' + (n.read ? '' : ' unread') + '" data-id="' + n.id + '" data-scope="' + scope + '" onclick="clickNotifItem(' + n.id + ',\'' + scope + '\')">' +
+      '<div class="ni-icon">' + n.icon + '</div>' +
+      '<div class="ni-body">' +
+        '<div class="ni-title">' + escHtml(n.title) + '</div>' +
+        '<div class="ni-desc">' + escHtml(n.desc) + '</div>' +
+        '<div class="ni-time">' + timeAgo(n.ts) + '</div>' +
+      '</div></div>';
+  });
+  listEl.innerHTML = html;
+}
+
+function toggleNotifDropdown(scope) {
+  var dd = document.getElementById('notif-dropdown-' + scope);
+  var willOpen = !dd.classList.contains('open');
+  // tutup semua dropdown lain
+  document.querySelectorAll('.notif-dropdown').forEach(function(d) { d.classList.remove('open'); });
+  if (willOpen) {
+    renderNotifBell(scope);
+    dd.classList.add('open');
+  }
+}
+
+function clearAllNotif(scope) {
+  notifHistory[scope].forEach(function(n) { n.read = true; });
+  notifUnread[scope] = 0;
+  renderNotifBell(scope);
+}
+
+function clickNotifItem(id, scope) {
+  var n = notifHistory[scope].find(function(x) { return x.id === id; });
+  if (n && !n.read) {
+    n.read = true;
+    if (notifUnread[scope] > 0) notifUnread[scope]--;
+  }
+  document.getElementById('notif-dropdown-' + scope).classList.remove('open');
+  renderNotifBell(scope);
+  if (n && n.page) {
+    if (scope === 'cm') cmShowPage(n.page); else admShowPage(n.page);
+  }
+}
+
+// tutup dropdown notif jika klik di luar area
+document.addEventListener('click', function(e) {
+  document.querySelectorAll('.notif-wrap').forEach(function(wrap) {
+    if (!wrap.contains(e.target)) {
+      var dd = wrap.querySelector('.notif-dropdown');
+      if (dd) dd.classList.remove('open');
+    }
+  });
+});
+
 // ── BADGE MENU ──
 function bumpBadge(key) {
   badgeCounts[key] = (badgeCounts[key] || 0) + 1;
@@ -1595,7 +1747,7 @@ function startRealtimeAdmin() {
   rtChannel = db.channel('admin-realtime')
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'tac' }, function(payload) {
       var r = payload.new;
-      showToast('📝', 'TAC baru masuk', (r.nama || '-') + ' • ' + (r.item_desc || '-'));
+      addNotif('adm', '📝', 'TAC baru masuk', (r.nama || '-') + ' • ' + (r.item_desc || '-'), 'data-tac');
       bumpBadge('adm-tac');
       loadADMData();
     })
@@ -1604,7 +1756,7 @@ function startRealtimeAdmin() {
     })
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'barang_bermasalah' }, function(payload) {
       var r = payload.new;
-      showToast('⚠️', 'Barang Bermasalah baru', (r.nama || '-') + ' • ' + (r.item_desc || '-'));
+      addNotif('adm', '⚠️', 'Barang Bermasalah baru', (r.nama || '-') + ' • ' + (r.item_desc || '-'), 'data-brg');
       bumpBadge('adm-brg');
       loadADMBRGData();
     })
@@ -1622,14 +1774,14 @@ function startRealtimeCellman() {
     .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'tac' }, function(payload) {
       var r = payload.new;
       if (r.created_by !== email) return;
-      showToast('✅', 'Data TAC Anda diupdate Admin', (r.item_desc || '-') + ' • status: ' + (r.status || '-'));
+      addNotif('cm', '✅', 'Data TAC Anda diupdate Admin', (r.item_desc || '-') + ' • status: ' + (r.status || '-'), 'form-tac');
       bumpBadge('cm-tac');
       loadCMData();
     })
     .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'barang_bermasalah' }, function(payload) {
       var r = payload.new;
       if (r.created_by !== email) return;
-      showToast('✅', 'Barang Bermasalah diupdate Admin', (r.item_desc || '-') + ' • status: ' + (r.status || '-'));
+      addNotif('cm', '✅', 'Barang Bermasalah diupdate Admin', (r.item_desc || '-') + ' • status: ' + (r.status || '-'), 'form-brg');
       bumpBadge('cm-brg');
       loadBRGData();
     })
