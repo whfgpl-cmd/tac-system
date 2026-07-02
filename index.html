@@ -161,8 +161,14 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
 
 <div id="toast-container"></div>
 
+<!-- BOOT / SESSION CHECK OVERLAY -->
+<div id="pg-boot" style="position:fixed;inset:0;background:#fff;z-index:999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;">
+  <div style="font-weight:bold;font-size:15px;letter-spacing:1px;">TAC SYSTEM</div>
+  <div style="font-size:12px;color:#888;">memeriksa sesi login...</div>
+</div>
+
 <!-- LOGIN -->
-<div class="page on" id="pg-login">
+<div class="page" id="pg-login">
   <div style="width:100%;max-width:360px;padding:0 16px">
     <h2 style="text-align:center;margin-bottom:6px;">TAC SYSTEM</h2>
     <p style="text-align:center;margin-bottom:20px;font-size:12px;color:#555;">WH FINISH GOODS</p>
@@ -865,6 +871,21 @@ var badgeCounts = { 'cm-tac':0, 'cm-brg':0, 'adm-tac':0, 'adm-brg':0 };
 var notifHistory = { cm: [], adm: [] };
 var notifUnread  = { cm: 0, adm: 0 };
 var notifSeq = 0;
+var notifiedIds = { adm_tac: new Set(), adm_brg: new Set(), cm_tac: new Set(), cm_brg: new Set() };
+
+// ── LAST-SEEN TIMESTAMP (disimpan di localStorage agar bertahan setelah refresh) ──
+function getLastSeen(tableKey) {
+  var v = localStorage.getItem('tacnotif_seen_' + tableKey);
+  if (v) return v;
+  // pertama kali dipakai: anggap data 24 jam terakhir masih "baru" agar tidak kosong,
+  // tapi tidak membanjiri dengan seluruh histori lama
+  var d = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
+  localStorage.setItem('tacnotif_seen_' + tableKey, d);
+  return d;
+}
+function setLastSeen(tableKey, iso) {
+  localStorage.setItem('tacnotif_seen_' + tableKey, iso);
+}
 
 // ── SIDEBAR ──
 function toggleSidebar(who) {
@@ -951,6 +972,50 @@ async function doLogout() {
   await db.auth.signOut();
   show('pg-login');
 }
+
+// ── RESTORE SESSION (tetap login setelah refresh / tarik-kebawah di mobile) ──
+async function restoreSession() {
+  try {
+    const { data, error } = await db.auth.getSession();
+    if (error) throw error;
+    var session = data && data.session;
+    if (session && session.user) {
+      currentUser = session.user;
+      var email = session.user.email || '';
+      if (isAdminEmail(email)) {
+        role = 'admin';
+        document.getElementById('adm-email-label').textContent = email;
+        show('pg-admin');
+        loadADMData();
+        loadADMBRGData();
+        startRealtimeAdmin();
+      } else {
+        role = 'cellman';
+        document.getElementById('cm-name-label').textContent = email;
+        show('pg-cellman');
+        loadCMData();
+        startRealtimeCellman();
+      }
+    } else {
+      show('pg-login');
+    }
+  } catch(e) {
+    console.error('restoreSession:', e);
+    show('pg-login');
+  } finally {
+    var boot = document.getElementById('pg-boot');
+    if (boot) boot.style.display = 'none';
+  }
+}
+
+// Jika sesi hilang/logout dari tab/perangkat lain, otomatis kembali ke halaman login
+db.auth.onAuthStateChange(function(event, session) {
+  if (event === 'SIGNED_OUT') {
+    stopRealtime();
+    currentUser = null;
+    show('pg-login');
+  }
+});
 
 function show(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
@@ -1077,6 +1142,8 @@ async function loadCMData() {
     .select('*').eq('created_by', email).order('created_at', { ascending: false });
   if (error) { console.error(error); return; }
   cmData = data || [];
+  generateNotifsFromRows('cm', 'cm_tac', cmData, 'action_at', function(r) { return !!r.action_by; },
+    function(r) { return { icon: '✅', title: 'Data TAC Anda diupdate Admin', desc: (r.item_desc || '-') + ' • status: ' + (r.status || '-'), page: 'form-tac' }; });
   filterCMTable();
 }
 
@@ -1170,6 +1237,8 @@ async function loadBRGData() {
     .select('*').eq('created_by', email).order('created_at', { ascending: false });
   if (error) { console.error(error); return; }
   brgData = data || [];
+  generateNotifsFromRows('cm', 'cm_brg', brgData, 'action_at', function(r) { return !!r.action_by; },
+    function(r) { return { icon: '✅', title: 'Barang Bermasalah diupdate Admin', desc: (r.item_desc || '-') + ' • status: ' + (r.status || '-'), page: 'form-brg' }; });
   filterBRGTable();
 }
 
@@ -1223,6 +1292,8 @@ async function loadADMData() {
   }
   document.getElementById('adm-msg').innerHTML = '';
   allData = data || [];
+  generateNotifsFromRows('adm', 'adm_tac', allData, 'created_at', function(r) { return true; },
+    function(r) { return { icon: '📝', title: 'TAC baru masuk', desc: (r.nama || '-') + ' • ' + (r.item_desc || '-'), page: 'data-tac' }; });
   filterTable();
 }
 
@@ -1275,6 +1346,8 @@ async function loadADMBRGData() {
   }
   document.getElementById('adm-brg-msg').innerHTML = '';
   admBrgData = data || [];
+  generateNotifsFromRows('adm', 'adm_brg', admBrgData, 'created_at', function(r) { return true; },
+    function(r) { return { icon: '⚠️', title: 'Barang Bermasalah baru', desc: (r.nama || '-') + ' • ' + (r.item_desc || '-'), page: 'data-brg' }; });
   filterADMBRGTable();
 }
 
@@ -1644,16 +1717,43 @@ function timeAgo(ts) {
   return Math.floor(diff/86400) + ' hari lalu';
 }
 
-// scope: 'cm' atau 'adm'
-function addNotif(scope, icon, title, desc, page) {
+// scope: 'cm' atau 'adm'. tableKey: 'adm_tac'|'adm_brg'|'cm_tac'|'cm_brg'. recordTs: timestamp asli data (created_at/action_at).
+function addNotif(scope, icon, title, desc, page, tableKey, recordTs, silent) {
   notifSeq++;
-  var item = { id: notifSeq, icon: icon, title: title, desc: desc || '', page: page || null, ts: Date.now(), read: false };
+  var tsVal = recordTs ? new Date(recordTs).getTime() : Date.now();
+  var item = { id: notifSeq, icon: icon, title: title, desc: desc || '', page: page || null, tableKey: tableKey || null, ts: tsVal, read: false };
   notifHistory[scope].unshift(item);
   if (notifHistory[scope].length > 30) notifHistory[scope].length = 30;
   notifUnread[scope]++;
   renderNotifBell(scope);
-  // toast tetap muncul juga
-  showToast(icon, title, desc);
+  // toast tetap muncul juga, kecuali saat catch-up data lama (silent)
+  if (!silent) showToast(icon, title, desc);
+}
+
+// Cegah notifikasi dobel untuk baris data yang sama (id) dalam 1 sesi
+function notifyRow(scope, tableKey, rowId, icon, title, desc, page, recordTs, silent) {
+  var idKey = tableKey + ':' + rowId;
+  if (notifiedIds[tableKey].has(idKey)) return;
+  notifiedIds[tableKey].add(idKey);
+  addNotif(scope, icon, title, desc, page, tableKey, recordTs, silent);
+}
+
+// Pindai data yang sudah dimuat (loadADMData/loadCMData/dst) untuk menangkap
+// data baru/terupdate yang BELUM sempat tertangkap oleh event realtime
+// (misalnya karena baru saja login / refresh halaman).
+function generateNotifsFromRows(scope, tableKey, rows, tsField, filterFn, buildFn) {
+  var lastSeenTime = new Date(getLastSeen(tableKey)).getTime();
+  var candidates = (rows || [])
+    .filter(filterFn)
+    .filter(function(r) {
+      var ts = r[tsField];
+      return ts && new Date(ts).getTime() > lastSeenTime;
+    })
+    .sort(function(a, b) { return new Date(a[tsField]) - new Date(b[tsField]); });
+  candidates.forEach(function(r) {
+    var built = buildFn(r);
+    notifyRow(scope, tableKey, r.id, built.icon, built.title, built.desc, built.page, r[tsField], true);
+  });
 }
 
 function renderNotifBell(scope) {
@@ -1700,6 +1800,9 @@ function toggleNotifDropdown(scope) {
 function clearAllNotif(scope) {
   notifHistory[scope].forEach(function(n) { n.read = true; });
   notifUnread[scope] = 0;
+  var tables = scope === 'adm' ? ['adm_tac', 'adm_brg'] : ['cm_tac', 'cm_brg'];
+  var nowIso = new Date().toISOString();
+  tables.forEach(function(t) { setLastSeen(t, nowIso); });
   renderNotifBell(scope);
 }
 
@@ -1708,6 +1811,10 @@ function clickNotifItem(id, scope) {
   if (n && !n.read) {
     n.read = true;
     if (notifUnread[scope] > 0) notifUnread[scope]--;
+  }
+  if (n && n.tableKey) {
+    var curSeen = new Date(getLastSeen(n.tableKey)).getTime();
+    if (n.ts > curSeen) setLastSeen(n.tableKey, new Date(n.ts).toISOString());
   }
   document.getElementById('notif-dropdown-' + scope).classList.remove('open');
   renderNotifBell(scope);
@@ -1747,7 +1854,7 @@ function startRealtimeAdmin() {
   rtChannel = db.channel('admin-realtime')
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'tac' }, function(payload) {
       var r = payload.new;
-      addNotif('adm', '📝', 'TAC baru masuk', (r.nama || '-') + ' • ' + (r.item_desc || '-'), 'data-tac');
+      notifyRow('adm', 'adm_tac', r.id, '📝', 'TAC baru masuk', (r.nama || '-') + ' • ' + (r.item_desc || '-'), 'data-tac', r.created_at, false);
       bumpBadge('adm-tac');
       loadADMData();
     })
@@ -1756,7 +1863,7 @@ function startRealtimeAdmin() {
     })
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'barang_bermasalah' }, function(payload) {
       var r = payload.new;
-      addNotif('adm', '⚠️', 'Barang Bermasalah baru', (r.nama || '-') + ' • ' + (r.item_desc || '-'), 'data-brg');
+      notifyRow('adm', 'adm_brg', r.id, '⚠️', 'Barang Bermasalah baru', (r.nama || '-') + ' • ' + (r.item_desc || '-'), 'data-brg', r.created_at, false);
       bumpBadge('adm-brg');
       loadADMBRGData();
     })
@@ -1774,14 +1881,14 @@ function startRealtimeCellman() {
     .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'tac' }, function(payload) {
       var r = payload.new;
       if (r.created_by !== email) return;
-      addNotif('cm', '✅', 'Data TAC Anda diupdate Admin', (r.item_desc || '-') + ' • status: ' + (r.status || '-'), 'form-tac');
+      notifyRow('cm', 'cm_tac', r.id, '✅', 'Data TAC Anda diupdate Admin', (r.item_desc || '-') + ' • status: ' + (r.status || '-'), 'form-tac', r.action_at, false);
       bumpBadge('cm-tac');
       loadCMData();
     })
     .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'barang_bermasalah' }, function(payload) {
       var r = payload.new;
       if (r.created_by !== email) return;
-      addNotif('cm', '✅', 'Barang Bermasalah diupdate Admin', (r.item_desc || '-') + ' • status: ' + (r.status || '-'), 'form-brg');
+      notifyRow('cm', 'cm_brg', r.id, '✅', 'Barang Bermasalah diupdate Admin', (r.item_desc || '-') + ' • status: ' + (r.status || '-'), 'form-brg', r.action_at, false);
       bumpBadge('cm-brg');
       loadBRGData();
     })
@@ -1810,6 +1917,9 @@ window.addEventListener('load', function() {
   document.getElementById('adm-brg-rep-dari').value   = firstDay;
   document.getElementById('adm-brg-rep-sampai').value = today;
   document.getElementById('l-email').value = 'cellman@tac.com';
+
+  // Cek sesi login yang tersimpan — jika masih valid, langsung masuk tanpa perlu login ulang
+  restoreSession();
 });
 
 document.getElementById('modal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
