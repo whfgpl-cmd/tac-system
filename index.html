@@ -156,6 +156,7 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
     </div>
     <button id="btn-login" onclick="doLogin()" style="width:100%;margin-top:4px">MASUK</button>
     <div id="l-err"></div>
+    <div id="l-restoring" style="display:none;text-align:center;margin-top:14px;font-size:12px;color:#555;">⏳ Memeriksa sesi login...</div>
   </div>
 </div>
 
@@ -849,7 +850,7 @@ function setRole(r) {
 // ── AUTH ──
 var ADMIN_EMAILS = ['admin@tac.com'];
 function isAdminEmail(email) {
-  return ADMIN_EMAILS.some(function(a) { return a.toLowerCase() === email.toLowerCase(); });
+  return ADMIN_EMAILS.some(function(a) { return a.toLowerCase() === (email||'').toLowerCase(); });
 }
 async function doLogin() {
   var email = document.getElementById('l-email').value.trim();
@@ -872,18 +873,7 @@ async function doLogin() {
     const { data, error } = await db.auth.signInWithPassword({ email, password: pass });
     if (error) throw error;
     currentUser = data.user;
-    if (role === 'admin') {
-      document.getElementById('adm-email-label').textContent = email;
-      show('pg-admin');
-      loadADMData();
-      loadADMBRGData();
-      startRealtimeAdmin();
-    } else {
-      document.getElementById('cm-name-label').textContent = email;
-      show('pg-cellman');
-      loadCMData();
-      startRealtimeCellman();
-    }
+    enterApp(role, email);
   } catch(e) {
     err.innerHTML = '<div class="msg err">Email / password salah</div>';
   } finally {
@@ -891,9 +881,27 @@ async function doLogin() {
   }
 }
 
+// Masuk ke halaman sesuai role (dipakai saat login manual maupun restore session)
+function enterApp(r, email) {
+  role = r;
+  if (r === 'admin') {
+    document.getElementById('adm-email-label').textContent = email;
+    show('pg-admin');
+    loadADMData();
+    loadADMBRGData();
+    startRealtimeAdmin();
+  } else {
+    document.getElementById('cm-name-label').textContent = email;
+    show('pg-cellman');
+    loadCMData();
+    startRealtimeCellman();
+  }
+}
+
 async function doLogout() {
   stopRealtime();
   await db.auth.signOut();
+  currentUser = null;
   show('pg-login');
 }
 
@@ -901,6 +909,35 @@ function show(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
   document.getElementById(id).classList.add('on');
 }
+
+// ── RESTORE SESSION SAAT REFRESH (F5) ──
+async function checkSession() {
+  var restoring = document.getElementById('l-restoring');
+  restoring.style.display = 'block';
+  try {
+    const { data, error } = await db.auth.getSession();
+    if (error) throw error;
+    var session = data && data.session;
+    if (session && session.user) {
+      currentUser = session.user;
+      var email = currentUser.email;
+      var r = isAdminEmail(email) ? 'admin' : 'cellman';
+      enterApp(r, email);
+    }
+  } catch(e) {
+    console.error('checkSession error:', e);
+  } finally {
+    restoring.style.display = 'none';
+  }
+}
+
+// Dengarkan perubahan auth (misal token refresh / logout dari tab lain)
+db.auth.onAuthStateChange(function(event, session) {
+  if (event === 'SIGNED_OUT') {
+    currentUser = null;
+    show('pg-login');
+  }
+});
 
 // ── SUBMENU TOGGLE ──
 function toggleSubmenu(key) {
@@ -1658,6 +1695,9 @@ window.addEventListener('load', function() {
   document.getElementById('adm-brg-rep-dari').value   = firstDay;
   document.getElementById('adm-brg-rep-sampai').value = today;
   document.getElementById('l-email').value = 'cellman@tac.com';
+
+  // Cek apakah ada sesi login yang masih aktif (menangani F5 / refresh)
+  checkSession();
 });
 
 document.getElementById('modal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
