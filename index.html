@@ -65,6 +65,14 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
 .filter-row .fgroup{margin-bottom:0;min-width:140px;}
 .opt-label{font-weight:normal;color:#888;font-size:11px;}
 .toolbar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center;}
+.pager{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:12px;font-size:13px;}
+.pager button{padding:5px 12px;font-size:12px;}
+.pager button:disabled{opacity:.35;cursor:not-allowed;}
+.pager span{min-width:50px;text-align:center;font-weight:bold;}
+@media (max-width:640px){
+  .pager{flex-wrap:wrap;gap:8px;}
+  .pager button{flex:1;min-width:110px;}
+}
 .search-wrap{display:flex;gap:0;flex:1;min-width:180px;max-width:340px;}
 .search-wrap input{border-right:none;border-radius:0;}
 .search-wrap button{border-radius:0;padding:6px 12px;white-space:nowrap;flex-shrink:0;}
@@ -94,6 +102,15 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
 /* NOTIF BADGE on sidebar menu */
 .menu-notif-badge{display:inline-block;background:#c00;color:#fff;font-size:10px;font-weight:bold;border-radius:10px;padding:1px 6px;margin-left:6px;min-width:16px;text-align:center;line-height:1.3;vertical-align:middle;}
 .menu-parent .menu-notif-badge{margin-left:auto;margin-right:6px;}
+
+/* NOTIF PERMISSION BANNER */
+.notif-banner{display:none;align-items:center;justify-content:space-between;gap:10px;background:#fff8e1;border:1px solid #e0c04a;padding:8px 12px;font-size:12px;margin:0 0 12px;flex-wrap:wrap;}
+.notif-banner.show{display:flex;}
+.notif-banner span{flex:1;min-width:180px;}
+.notif-banner button{padding:5px 10px;font-size:12px;}
+.notif-status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle;}
+.notif-status-dot.on{background:#2a7;}
+.notif-status-dot.off{background:#c00;}
 
 @media (max-width: 640px) {
   .sidebar{position:fixed;top:0;left:0;height:100vh;z-index:200;width:0;transition:width .25s ease;}
@@ -171,6 +188,7 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
       <strong>TAC SYSTEM</strong>
     </div>
     <div class="topbar-right">
+      <button onclick="toggleNotifPanelInfo()" id="cm-notif-bell" title="Status notifikasi" style="padding:4px 8px;font-size:14px;background:transparent;border:none;color:#fff;cursor:pointer;">🔔</button>
       <span id="cm-name-label" style="font-size:12px;opacity:.7;"></span>
       <button onclick="doLogout()" style="padding:4px 10px;font-size:12px;">KELUAR</button>
     </div>
@@ -202,6 +220,11 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
       </ul>
     </div>
     <div class="main-content">
+
+      <div class="notif-banner" id="cm-notif-banner">
+        <span><span class="notif-status-dot off" id="cm-notif-dot"></span><span id="cm-notif-text">Aktifkan notifikasi HP agar Anda mendapat pemberitahuan saat Admin memproses data Anda.</span></span>
+        <button onclick="requestNotifPermission()">AKTIFKAN</button>
+      </div>
 
       <!-- FORM TAC -->
       <div id="cm-page-form-tac">
@@ -314,6 +337,11 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
             </tbody>
           </table>
         </div>
+        <div class="pager" id="cm-pager">
+          <button onclick="cmGoToPage(-1)" class="outline"><<</button>
+          <span id="cm-pager-info">1 / 1</span>
+          <button onclick="cmGoToPage(1)" class="outline">>></button>
+        </div>
       </div>
 
       <!-- FORM BARANG BERMASALAH (CELLMAN) -->
@@ -412,6 +440,11 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
             </tbody>
           </table>
         </div>
+        <div class="pager" id="brg-pager">
+          <button onclick="brgGoToPage(-1)" class="outline"><<</button>
+          <span id="brg-pager-info">1 / 1</span>
+          <button onclick="brgGoToPage(1)" class="outline">>></button>
+        </div>
       </div>
 
       <!-- REPORT TAC -->
@@ -457,6 +490,7 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
       <strong>TAC SYSTEM — ADMIN</strong>
     </div>
     <div class="topbar-right">
+      <button onclick="toggleNotifPanelInfo()" id="adm-notif-bell" title="Status notifikasi" style="padding:4px 8px;font-size:14px;background:transparent;border:none;color:#fff;cursor:pointer;">🔔</button>
       <span id="adm-email-label" style="font-size:12px;opacity:.7;"></span>
       <button onclick="doLogout()" style="padding:4px 10px;font-size:12px;">KELUAR</button>
     </div>
@@ -489,6 +523,11 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
     </div>
     <div class="main-content">
 
+      <div class="notif-banner" id="adm-notif-banner">
+        <span><span class="notif-status-dot off" id="adm-notif-dot"></span><span id="adm-notif-text">Aktifkan notifikasi HP agar Anda langsung tahu saat ada TAC / Barang Bermasalah baru.</span></span>
+        <button onclick="requestNotifPermission()">AKTIFKAN</button>
+      </div>
+
       <!-- DATA TAC (ADMIN) -->
       <div id="adm-page-data-tac">
         <h2>DATA TAC</h2>
@@ -520,6 +559,11 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
               <tr><td colspan="13" style="text-align:center;padding:20px;color:#888;">— memuat data —</td></tr>
             </tbody>
           </table>
+        </div>
+        <div class="pager" id="adm-pager">
+          <button onclick="admGoToPage(-1)" class="outline"><<</button>
+          <span id="adm-pager-info">1 / 1</span>
+          <button onclick="admGoToPage(1)" class="outline">>></button>
         </div>
       </div>
 
@@ -554,6 +598,11 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
               <tr><td colspan="14" style="text-align:center;padding:20px;color:#888;">— memuat data —</td></tr>
             </tbody>
           </table>
+        </div>
+        <div class="pager" id="adm-brg-pager">
+          <button onclick="admBrgGoToPage(-1)" class="outline"><<</button>
+          <span id="adm-brg-pager-info">1 / 1</span>
+          <button onclick="admBrgGoToPage(1)" class="outline">>></button>
         </div>
       </div>
 
@@ -806,7 +855,16 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
 const SUPA_URL = 'https://addgggshvsvnzbzdbgnq.supabase.co';
 const SUPA_KEY = 'sb_publishable__xCcA-NNlTCRpF8K5c5LUw_k2I_1789';
 const { createClient } = supabase;
-const db = createClient(SUPA_URL, SUPA_KEY);
+const db = createClient(SUPA_URL, SUPA_KEY, {
+  auth: {
+    persistSession: true,     // simpan sesi login di localStorage browser
+    autoRefreshToken: true,   // perpanjang otomatis sebelum token kedaluwarsa
+    detectSessionInUrl: false
+  }
+});
+
+// VAPID public key untuk Web Push (private key disimpan di server/Supabase Edge Function, TIDAK di sini)
+const VAPID_PUBLIC_KEY = 'BP6VbY5iMIlT8RIjST1MpY12JZoFkqesqZaoQ3qz825LXGvNJQFEhehIgkn6garLREqlxe55XvEjwjhB3Nqhfrw';
 
 var role = 'cellman';
 var currentUser = null;
@@ -826,6 +884,166 @@ var LOCKED_STATUSES_FOR_CELLMAN = ['POSTED'];
 // ── REALTIME & NOTIFIKASI ──
 var rtChannel = null;
 var badgeCounts = { 'cm-tac':0, 'cm-brg':0, 'adm-tac':0, 'adm-brg':0 };
+
+// ── NOTIFIKASI HP: Notification API (tab terbuka) + Web Push (app ditutup) ──
+var NOTIF_ICON = 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f4e6.png';
+
+var swRegistration = null;
+
+function notifSupported() {
+  return ('Notification' in window);
+}
+
+function pushSupported() {
+  return ('serviceWorker' in navigator) && ('PushManager' in window);
+}
+
+// Ubah base64 VAPID key jadi Uint8Array (format yang diminta PushManager)
+function urlBase64ToUint8Array(base64String) {
+  var padding = '='.repeat((4 - base64String.length % 4) % 4);
+  var base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  var rawData = atob(base64);
+  var outputArray = new Uint8Array(rawData.length);
+  for (var i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
+
+// Daftarkan service worker sekali saat halaman load (tidak perlu izin dulu)
+async function registerServiceWorker() {
+  if (!pushSupported()) return null;
+  try {
+    swRegistration = await navigator.serviceWorker.register('/service-worker.js');
+    return swRegistration;
+  } catch(e) {
+    console.error('Gagal daftar service worker:', e);
+    return null;
+  }
+}
+
+// Subscribe ke Push Manager dan simpan endpoint-nya ke Supabase
+async function subscribeToPush() {
+  if (!pushSupported()) return;
+  if (!swRegistration) swRegistration = await registerServiceWorker();
+  if (!swRegistration) return;
+
+  try {
+    var existing = await swRegistration.pushManager.getSubscription();
+    var sub = existing || await swRegistration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+    });
+
+    var json = sub.toJSON();
+    var email = currentUser ? currentUser.email : '';
+    if (!email) return;
+
+    await db.from('push_subscriptions').upsert({
+      user_email : email,
+      role       : isAdminEmail(email) ? 'admin' : 'cellman',
+      endpoint   : json.endpoint,
+      p256dh     : json.keys.p256dh,
+      auth       : json.keys.auth
+    }, { onConflict: 'endpoint' });
+
+  } catch(e) {
+    console.error('Gagal subscribe push:', e);
+  }
+}
+
+// Hapus subscription (dipanggil saat logout, supaya device lama tidak terus dikirimi push)
+async function unsubscribeFromPush() {
+  if (!swRegistration) return;
+  try {
+    var sub = await swRegistration.pushManager.getSubscription();
+    if (sub) {
+      await db.from('push_subscriptions').delete().eq('endpoint', sub.endpoint);
+      await sub.unsubscribe();
+    }
+  } catch(e) {
+    console.error('Gagal unsubscribe push:', e);
+  }
+}
+
+// Update tampilan banner + titik status sesuai izin saat ini
+function refreshNotifUI() {
+  if (!notifSupported()) return;
+  var perm = Notification.permission; // 'default' | 'granted' | 'denied'
+  ['cm', 'adm'].forEach(function(prefix) {
+    var banner = document.getElementById(prefix + '-notif-banner');
+    var dot    = document.getElementById(prefix + '-notif-dot');
+    var text   = document.getElementById(prefix + '-notif-text');
+    if (!banner) return;
+    if (perm === 'granted') {
+      banner.classList.remove('show');
+      if (dot)  dot.className = 'notif-status-dot on';
+    } else if (perm === 'denied') {
+      banner.classList.add('show');
+      banner.querySelector('button').style.display = 'none';
+      if (text) text.textContent = 'Notifikasi diblokir browser. Aktifkan lewat pengaturan situs (izin notifikasi) lalu refresh halaman.';
+      if (dot)  dot.className = 'notif-status-dot off';
+    } else {
+      banner.classList.add('show');
+      var btn = banner.querySelector('button');
+      if (btn) btn.style.display = '';
+      if (dot) dot.className = 'notif-status-dot off';
+    }
+  });
+}
+
+// Diklik dari tombol lonceng 🔔 di topbar — cuma info singkat
+function toggleNotifPanelInfo() {
+  if (!notifSupported()) { alert('Browser ini tidak mendukung notifikasi.'); return; }
+  var perm = Notification.permission;
+  if (perm === 'granted') {
+    alert('🔔 Notifikasi AKTIF. Anda akan menerima notifikasi HP untuk update terbaru — bahkan saat aplikasi/tab ini ditutup.');
+  } else if (perm === 'denied') {
+    alert('🔕 Notifikasi DIBLOKIR. Buka pengaturan situs di browser Anda, izinkan Notification untuk situs ini, lalu refresh halaman.');
+  } else {
+    requestNotifPermission();
+  }
+}
+
+async function requestNotifPermission() {
+  if (!notifSupported()) { alert('Browser ini tidak mendukung notifikasi.'); return; }
+  try {
+    var result = await Notification.requestPermission();
+    refreshNotifUI();
+    if (result === 'granted') {
+      sendNativeNotification('🔔 Notifikasi Aktif', 'TAC SYSTEM akan mengirim notifikasi ke HP Anda, bahkan saat app ditutup.');
+      // Daftarkan push subscription agar notifikasi tetap jalan walau tab ditutup
+      await subscribeToPush();
+    }
+  } catch(e) {
+    console.error('Gagal minta izin notifikasi:', e);
+  }
+}
+
+// Kirim notifikasi ke layar HP/desktop (muncul di tray notifikasi OS)
+function sendNativeNotification(title, body) {
+  if (!notifSupported()) return;
+  if (Notification.permission !== 'granted') return;
+  try {
+    var n = new Notification(title, {
+      body: body || '',
+      icon: NOTIF_ICON,
+      badge: NOTIF_ICON,
+      tag: 'tac-system-' + Date.now(),
+      vibrate: [200, 100, 200]
+    });
+    n.onclick = function() {
+      window.focus();
+      n.close();
+    };
+    // Getarkan HP kalau didukung (tambahan efek di Android)
+    if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+    // Auto tutup setelah beberapa detik biar tidak menumpuk
+    setTimeout(function() { n.close(); }, 8000);
+  } catch(e) {
+    console.error('Gagal mengirim notifikasi:', e);
+  }
+}
 
 // ── SIDEBAR ──
 function toggleSidebar(who) {
@@ -911,10 +1129,18 @@ function enterApp(r, email) {
     loadCMData();
     startRealtimeCellman();
   }
+  refreshNotifUI();
+
+  // Kalau izin notifikasi sudah pernah diberikan sebelumnya, langsung pastikan
+  // push subscription untuk device ini tersimpan (misal setelah ganti browser/HP baru)
+  if (notifSupported() && Notification.permission === 'granted') {
+    subscribeToPush();
+  }
 }
 
 async function doLogout() {
   stopRealtime();
+  await unsubscribeFromPush();
   await db.auth.signOut();
   currentUser = null;
   show('pg-login');
@@ -1077,6 +1303,10 @@ async function loadCMData() {
   filterCMTable();
 }
 
+var ITEMS_PER_PAGE = 10;
+var cmPage = 1;
+var cmFilteredRows = [];
+
 function filterCMTable() {
   var search = (document.getElementById('cm-search').value || '').toLowerCase();
   var filtered = search
@@ -1087,10 +1317,36 @@ function filterCMTable() {
         (r.note||'').toLowerCase().includes(search)
       )
     : cmData;
-  renderCMTable(filtered);
+  cmFilteredRows = filtered;
+  cmPage = 1;
+  renderCMTablePage();
 }
 
-function renderCMTable(rows) {
+function cmGoToPage(delta) {
+  cmPage += delta;
+  renderCMTablePage();
+}
+
+function renderCMTablePage() {
+  var totalPages = Math.max(1, Math.ceil(cmFilteredRows.length / ITEMS_PER_PAGE));
+  if (cmPage > totalPages) cmPage = totalPages;
+  if (cmPage < 1) cmPage = 1;
+  var start = (cmPage - 1) * ITEMS_PER_PAGE;
+  var pageRows = cmFilteredRows.slice(start, start + ITEMS_PER_PAGE);
+  renderCMTable(pageRows, start);
+
+  var info = document.getElementById('cm-pager-info');
+  if (info) info.textContent = cmPage + ' / ' + totalPages;
+  var pager = document.getElementById('cm-pager');
+  if (pager) {
+    var btns = pager.querySelectorAll('button');
+    btns[0].disabled = cmPage <= 1;
+    btns[1].disabled = cmPage >= totalPages;
+  }
+}
+
+function renderCMTable(rows, offset) {
+  offset = offset || 0;
   var html = '';
   rows.forEach(function(r, i) {
     var locked = LOCKED_STATUSES_FOR_CELLMAN.includes(r.status);
@@ -1101,7 +1357,7 @@ function renderCMTable(rows) {
           '<button class="btn-icon del" data-id="' + r.id + '" data-caller="cm" onclick="hapusData(this.dataset.id,this.dataset.caller)">🗑️</button>' +
         '</div>';
     html += '<tr>' +
-      '<td>' + (i+1) + '</td>' +
+      '<td>' + (offset+i+1) + '</td>' +
       '<td>' + (r.nama||'-') + '</td>' +
       '<td>' + (r.tanggal||'-') + '</td>' +
       '<td>' + (r.from_sub_io||'-') + '</td>' +
@@ -1183,10 +1439,39 @@ function filterBRGTable() {
         (r.lot_no||'').toLowerCase().includes(search)
       )
     : brgData;
-  renderBRGTable(filtered, 'brg-tbody', 'cm');
+  brgFilteredRows = filtered;
+  brgPage = 1;
+  renderBRGTablePage();
 }
 
-function renderBRGTable(rows, tbodyId, caller) {
+var brgPage = 1;
+var brgFilteredRows = [];
+
+function brgGoToPage(delta) {
+  brgPage += delta;
+  renderBRGTablePage();
+}
+
+function renderBRGTablePage() {
+  var totalPages = Math.max(1, Math.ceil(brgFilteredRows.length / ITEMS_PER_PAGE));
+  if (brgPage > totalPages) brgPage = totalPages;
+  if (brgPage < 1) brgPage = 1;
+  var start = (brgPage - 1) * ITEMS_PER_PAGE;
+  var pageRows = brgFilteredRows.slice(start, start + ITEMS_PER_PAGE);
+  renderBRGTable(pageRows, 'brg-tbody', 'cm', start);
+
+  var info = document.getElementById('brg-pager-info');
+  if (info) info.textContent = brgPage + ' / ' + totalPages;
+  var pager = document.getElementById('brg-pager');
+  if (pager) {
+    var btns = pager.querySelectorAll('button');
+    btns[0].disabled = brgPage <= 1;
+    btns[1].disabled = brgPage >= totalPages;
+  }
+}
+
+function renderBRGTable(rows, tbodyId, caller, offset) {
+  offset = offset || 0;
   var html = '';
   rows.forEach(function(r, i) {
     var locked = caller === 'cm' && LOCKED_STATUSES_FOR_CELLMAN.includes(r.status);
@@ -1197,7 +1482,7 @@ function renderBRGTable(rows, tbodyId, caller) {
           '<button class="btn-icon del" data-id="' + String(r.id) + '" data-caller="brg-' + caller + '" onclick="hapusData(this.dataset.id,this.dataset.caller)">🗑️</button>' +
         '</div>';
     html += '<tr>' +
-      '<td>' + (i+1) + '</td>' +
+      '<td>' + (offset+i+1) + '</td>' +
       '<td>' + (r.nama||'-') + '</td>' +
       '<td>' + (r.tanggal||'-') + '</td>' +
       '<td>' + (r.from_sub_io||'-') + '</td>' +
@@ -1231,6 +1516,9 @@ async function loadADMData() {
   filterTable();
 }
 
+var admPage = 1;
+var admFilteredRows = [];
+
 function filterTable() {
   var search = (document.getElementById('adm-search').value || '').toLowerCase();
   var fSt    = document.getElementById('adm-filter').value;
@@ -1244,10 +1532,40 @@ function filterTable() {
     );
     return ok;
   });
+  admFilteredRows = filtered;
+  admPage = 1;
+  renderADMTablePage();
+}
+
+function admGoToPage(delta) {
+  admPage += delta;
+  renderADMTablePage();
+}
+
+function renderADMTablePage() {
+  var totalPages = Math.max(1, Math.ceil(admFilteredRows.length / ITEMS_PER_PAGE));
+  if (admPage > totalPages) admPage = totalPages;
+  if (admPage < 1) admPage = 1;
+  var start = (admPage - 1) * ITEMS_PER_PAGE;
+  var pageRows = admFilteredRows.slice(start, start + ITEMS_PER_PAGE);
+  renderADMTable(pageRows, start);
+
+  var info = document.getElementById('adm-pager-info');
+  if (info) info.textContent = admPage + ' / ' + totalPages;
+  var pager = document.getElementById('adm-pager');
+  if (pager) {
+    var btns = pager.querySelectorAll('button');
+    btns[0].disabled = admPage <= 1;
+    btns[1].disabled = admPage >= totalPages;
+  }
+}
+
+function renderADMTable(filtered, offset) {
+  offset = offset || 0;
   var html = '';
   filtered.forEach(function(r, i) {
     html += '<tr>' +
-      '<td>' + (i+1) + '</td>' +
+      '<td>' + (offset+i+1) + '</td>' +
       '<td>' + (r.nama||'-') + '</td>' +
       '<td>' + (r.tanggal||'-') + '</td>' +
       '<td>' + (r.from_sub_io||'-') + '</td>' +
@@ -1296,7 +1614,35 @@ function filterADMBRGTable() {
     );
     return ok;
   });
-  renderBRGTable(filtered, 'adm-brg-tbody', 'adm');
+  admBrgFilteredRows = filtered;
+  admBrgPage = 1;
+  renderADMBRGTablePage();
+}
+
+var admBrgPage = 1;
+var admBrgFilteredRows = [];
+
+function admBrgGoToPage(delta) {
+  admBrgPage += delta;
+  renderADMBRGTablePage();
+}
+
+function renderADMBRGTablePage() {
+  var totalPages = Math.max(1, Math.ceil(admBrgFilteredRows.length / ITEMS_PER_PAGE));
+  if (admBrgPage > totalPages) admBrgPage = totalPages;
+  if (admBrgPage < 1) admBrgPage = 1;
+  var start = (admBrgPage - 1) * ITEMS_PER_PAGE;
+  var pageRows = admBrgFilteredRows.slice(start, start + ITEMS_PER_PAGE);
+  renderBRGTable(pageRows, 'adm-brg-tbody', 'adm', start);
+
+  var info = document.getElementById('adm-brg-pager-info');
+  if (info) info.textContent = admBrgPage + ' / ' + totalPages;
+  var pager = document.getElementById('adm-brg-pager');
+  if (pager) {
+    var btns = pager.querySelectorAll('button');
+    btns[0].disabled = admBrgPage <= 1;
+    btns[1].disabled = admBrgPage >= totalPages;
+  }
 }
 
 // ── MODAL EDIT TAC ──
@@ -1636,7 +1982,7 @@ async function downloadExcelBRGADM() {
   msg.innerHTML = '<div class="msg ok">✓ File berhasil didownload (' + data.length + ' baris)</div>';
 }
 
-// ── TOAST NOTIFIKASI ──
+// ── TOAST NOTIFIKASI (dalam halaman) ──
 function showToast(icon, title, desc) {
   var container = document.getElementById('toast-container');
   var el = document.createElement('div');
@@ -1673,6 +2019,7 @@ function startRealtimeAdmin() {
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'tac' }, function(payload) {
       var r = payload.new;
       showToast('📝', 'TAC baru masuk', (r.nama || '-') + ' • ' + (r.item_desc || '-'));
+      sendNativeNotification('📝 TAC Baru Masuk', (r.nama || '-') + ' • ' + (r.item_desc || '-') + ' • ' + (r.qty || '-') + ' pcs');
       bumpBadge('adm-tac');
       loadADMData();
     })
@@ -1682,6 +2029,7 @@ function startRealtimeAdmin() {
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'barang_bermasalah' }, function(payload) {
       var r = payload.new;
       showToast('⚠️', 'Barang Bermasalah baru', (r.nama || '-') + ' • ' + (r.item_desc || '-'));
+      sendNativeNotification('⚠️ Barang Bermasalah Baru', (r.nama || '-') + ' • ' + (r.item_desc || '-'));
       bumpBadge('adm-brg');
       loadADMBRGData();
     })
@@ -1700,6 +2048,7 @@ function startRealtimeCellman() {
       var r = payload.new;
       if (r.created_by !== email) return;
       showToast('✅', 'Data TAC Anda diupdate Admin', (r.item_desc || '-') + ' • status: ' + (r.status || '-'));
+      sendNativeNotification('✅ TAC Anda Diupdate', (r.item_desc || '-') + ' • status: ' + (r.status || '-'));
       bumpBadge('cm-tac');
       loadCMData();
     })
@@ -1707,6 +2056,7 @@ function startRealtimeCellman() {
       var r = payload.new;
       if (r.created_by !== email) return;
       showToast('✅', 'Barang Bermasalah diupdate Admin', (r.item_desc || '-') + ' • status: ' + (r.status || '-'));
+      sendNativeNotification('✅ Barang Bermasalah Diupdate', (r.item_desc || '-') + ' • status: ' + (r.status || '-'));
       bumpBadge('cm-brg');
       loadBRGData();
     })
@@ -1735,6 +2085,9 @@ window.addEventListener('load', function() {
   document.getElementById('adm-brg-rep-dari').value   = firstDay;
   document.getElementById('adm-brg-rep-sampai').value = today;
   document.getElementById('l-email').value = 'cellman@tac.com';
+
+  // Daftarkan service worker sedini mungkin (tidak perlu izin notifikasi dulu)
+  registerServiceWorker();
 
   // Cek apakah ada sesi login yang masih aktif (menangani F5 / refresh)
   checkSession();
