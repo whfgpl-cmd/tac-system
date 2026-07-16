@@ -329,7 +329,9 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
               <tr>
                 <th>NO</th><th>NAMA</th><th>TANGGAL</th><th>FROM SUB IO</th>
                 <th>TO SUB IO</th><th>UK MOTIF</th><th>MOTIF</th><th>LOT NO</th>
-                <th>QTY</th><th>CATATAN</th><th>STATUS</th><th>ACTION</th><th>EDIT</th>
+                <th>QTY</th><th>CATATAN</th>
+                <th id="th-status-cm" class="th-status-sort" onclick="cycleStatusFilter('cm')" title="Klik untuk filter status">STATUS <span class="status-th-val">SEMUA</span><span class="status-th-icon">⇅</span></th>
+                <th>ACTION BY</th><th>EDIT</th>
               </tr>
             </thead>
             <tbody id="cm-tbody">
@@ -432,7 +434,9 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
               <tr>
                 <th>NO</th><th>NAMA</th><th>TANGGAL</th><th>SUBINVENTORY</th><th>UK MOTIF</th>
                 <th>MOTIF</th><th>LOT NO</th><th>JML</th>
-                <th>ALASAN</th><th>STATUS</th><th>ALASAN ADMIN</th><th>PENYELESAIAN</th><th>ACTION</th><th>EDIT</th>
+                <th>ALASAN</th>
+                <th id="th-status-brg" class="th-status-sort" onclick="cycleStatusFilter('brg')" title="Klik untuk filter status">STATUS <span class="status-th-val">SEMUA</span><span class="status-th-icon">⇅</span></th>
+                <th>REASON ADMIN</th><th>PENYELESAIAN</th><th>ACTION BY</th><th>EDIT</th>
               </tr>
             </thead>
             <tbody id="brg-tbody">
@@ -536,7 +540,7 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
             <input id="adm-search" type="text" placeholder="cari nama / item / lot..." oninput="filterTable()">
             <button onclick="filterTable()" title="Cari">🔍</button>
           </div>
-          <select id="adm-filter" onchange="filterTable()" style="width:130px;">
+            <select id="adm-filter" onchange="filterTable(); updateStatusHeaderLabel('adm', this.value);" style="width:130px;">
             <option value="">SEMUA STATUS</option>
             <option value="DRAFT">DRAFT</option>
             <option value="WAIT">WAIT</option>
@@ -552,9 +556,11 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
               <tr>
                 <th>NO</th><th>NAMA</th><th>TANGGAL</th><th>FROM SUB IO</th>
                 <th>TO SUB IO</th><th>UK MOTIF</th><th>MOTIF</th><th>LOT NO</th>
-                <th>QTY</th><th>NOTE</th><th>STATUS</th><th>ACTION</th><th>EDIT</th>
+                <th>QTY</th><th>NOTE</th>
+                 <th id="th-status-adm" class="th-status-sort" onclick="cycleStatusFilter('adm')" title="Klik untuk filter status">STATUS <span class="status-th-val">SEMUA</span><span class="status-th-icon">⇅</span></th>
+                <th>ACTION BY</th><th>EDIT</th>
               </tr>
-            </thead>
+             </thead>
             <tbody id="adm-tbody">
               <tr><td colspan="13" style="text-align:center;padding:20px;color:#888;">— memuat data —</td></tr>
             </tbody>
@@ -575,7 +581,7 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
             <input id="adm-brg-search" type="text" placeholder="cari nama / item / lot..." oninput="filterADMBRGTable()">
             <button onclick="filterADMBRGTable()" title="Cari">🔍</button>
           </div>
-          <select id="adm-brg-filter" onchange="filterADMBRGTable()" style="width:130px;">
+          <select id="adm-brg-filter" onchange="filterADMBRGTable(); updateStatusHeaderLabel('adm-brg', this.value);"
             <option value="">SEMUA STATUS</option>
             <option value="DRAFT">DRAFT</option>
             <option value="WAIT">WAIT</option>
@@ -591,7 +597,9 @@ h2{font-size:15px;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom
               <tr>
                 <th>NO</th><th>NAMA</th><th>TANGGAL</th><th>SUBINVENTORY</th><th>UK MOTIF</th>
                 <th>MOTIF</th><th>LOT NO</th><th>QTY</th>
-                <th>REASON</th><th>STATUS</th><th>REASON ADMIN</th><th>PENYELESAIAN</th><th>ACTION</th><th>EDIT</th>
+                <th>REASON</th>
+                <th id="th-status-adm-brg" class="th-status-sort" onclick="cycleStatusFilter('adm-brg')" title="Klik untuk filter status">STATUS <span class="status-th-val">SEMUA</span><span class="status-th-icon">⇅</span></th>
+                <th>REASON ADMIN</th><th>PENYELESAIAN</th><th>ACTION BY</th><th>EDIT</th>
               </tr>
             </thead>
             <tbody id="adm-brg-tbody">
@@ -884,7 +892,12 @@ var LOCKED_STATUSES_FOR_CELLMAN = ['POSTED'];
 // ── REALTIME & NOTIFIKASI ──
 var rtChannel = null;
 var badgeCounts = { 'cm-tac':0, 'cm-brg':0, 'adm-tac':0, 'adm-brg':0 };
-
+  
+// ── STATUS SORT/FILTER (klik header STATUS) ──
+var cmStatusFilter = '';
+var brgStatusFilter = '';
+var statusCycleOrder = ['', 'DRAFT', 'WAIT', 'DONE'];
+  
 // ── NOTIFIKASI HP: Notification API (tab terbuka) + Web Push (app ditutup) ──
 var NOTIF_ICON = 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f4e6.png';
 
@@ -1043,6 +1056,41 @@ function sendNativeNotification(title, body) {
   } catch(e) {
     console.error('Gagal mengirim notifikasi:', e);
   }
+}
+  var cmStatusFilter = '';
+var brgStatusFilter = '';
+var statusCycleOrder = ['', 'DRAFT', 'WAIT', 'DONE'];
+
+function cycleStatusFilter(scope) {
+  var next;
+  if (scope === 'cm') {
+    next = statusCycleOrder[(statusCycleOrder.indexOf(cmStatusFilter) + 1) % statusCycleOrder.length];
+    cmStatusFilter = next;
+    filterCMTable();
+  } else if (scope === 'brg') {
+    next = statusCycleOrder[(statusCycleOrder.indexOf(brgStatusFilter) + 1) % statusCycleOrder.length];
+    brgStatusFilter = next;
+    filterBRGTable();
+  } else if (scope === 'adm') {
+    var sel = document.getElementById('adm-filter');
+    next = statusCycleOrder[(statusCycleOrder.indexOf(sel.value) + 1) % statusCycleOrder.length];
+    sel.value = next;
+    filterTable();
+  } else if (scope === 'adm-brg') {
+    var sel2 = document.getElementById('adm-brg-filter');
+    next = statusCycleOrder[(statusCycleOrder.indexOf(sel2.value) + 1) % statusCycleOrder.length];
+    sel2.value = next;
+    filterADMBRGTable();
+  }
+  updateStatusHeaderLabel(scope, next);
+}
+
+function updateStatusHeaderLabel(scope, val) {
+  var th = document.getElementById('th-status-' + scope);
+  if (!th) return;
+  var lab = th.querySelector('.status-th-val');
+  if (lab) lab.textContent = val || 'SEMUA';
+  th.classList.toggle('status-th-active', !!val);
 }
 
 // ── SIDEBAR ──
@@ -1309,18 +1357,21 @@ var cmFilteredRows = [];
 
 function filterCMTable() {
   var search = (document.getElementById('cm-search').value || '').toLowerCase();
-  var filtered = search
-    ? cmData.filter(r =>
-        (r.nama||'').toLowerCase().includes(search) ||
-        (r.item_desc||'').toLowerCase().includes(search) ||
-        (r.lot_no||'').toLowerCase().includes(search) ||
-        (r.note||'').toLowerCase().includes(search)
-      )
-    : cmData;
-  cmFilteredRows = filtered;
-  cmPage = 1;
-  renderCMTablePage();
+  var filtered = cmData.filter(function(r) {
+    var ok = !cmStatusFilter || r.status === cmStatusFilter;
+    if (search) ok = ok && (
+      (r.nama||'').toLowerCase().includes(search) ||
+      (r.item_desc||'').toLowerCase().includes(search) ||
+      (r.lot_no||'').toLowerCase().includes(search) ||
+      (r.note||'').toLowerCase().includes(search)
+    );
+    return ok;
+  });
+  filteredCache.cm = filtered;
+  pageState.cm = 1;
+  renderPagedTable('cm');
 }
+
 
 function cmGoToPage(delta) {
   cmPage += delta;
